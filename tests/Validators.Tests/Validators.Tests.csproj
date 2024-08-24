@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Backend\CashFlow.Application\CashFlow.Application.csproj" />
     <ProjectReference Include="..\..\src\Shared\CashFlow.Communication\CashFlow.Communication.csproj" />
+    <ProjectReference Include="..\..\src\Shared\CashFlow.Exception\CashFlow.Exception.csproj" />
     <ProjectReference Include="..\Commom.Test.Utilities\Commom.Test.Utilities.csproj" />
   </ItemGroup>
 
