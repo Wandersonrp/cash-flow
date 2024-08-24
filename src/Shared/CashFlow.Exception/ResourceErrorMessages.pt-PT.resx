@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AMOUNT_MUST_BE_GREATER_THAN_ZERO" xml:space="preserve">
-    <value>O montante deve ser maio que 0</value>
+    <value>O montante deve ser maior que 0</value>
   </data>
   <data name="EXPENSES_CANNOT_BE_FOR_FUTURE" xml:space="preserve">
     <value>As despesas não podem ser para o futuro</value>
