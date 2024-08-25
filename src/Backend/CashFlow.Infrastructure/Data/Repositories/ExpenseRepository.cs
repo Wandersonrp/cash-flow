@@ -13,12 +13,9 @@ internal class ExpenseRepository : IExpenseRepository
         _context = context;
     }
 
-
     public async Task<Expense> AddAsync(Expense expense)
     {
         var result = await _context.Expenses.AddAsync(expense);
-
-        await _context.SaveChangesAsync();
 
         return result.Entity;
     }

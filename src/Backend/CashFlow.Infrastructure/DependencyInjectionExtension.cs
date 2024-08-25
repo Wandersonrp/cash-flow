@@ -1,6 +1,8 @@
 ﻿using CashFlow.Domain.Repositories.Expenses;
+using CashFlow.Domain.Repositories.UnitOfWork;
 using CashFlow.Infrastructure.Data.Context;
 using CashFlow.Infrastructure.Data.Repositories;
+using CashFlow.Infrastructure.Data.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +14,7 @@ public static class DependencyInjectionExtension
     {
         AddDbContext(services, configuration);
         AddRepositories(services);
+        AddUnitOfWork(services);
     }
 
     private static void AddRepositories(IServiceCollection services)
@@ -29,5 +32,11 @@ public static class DependencyInjectionExtension
         {
             options.UseNpgsql(connectionString);
         });
+    }
+
+    private static void AddUnitOfWork(IServiceCollection services)
+    {
+        services
+            .AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }
