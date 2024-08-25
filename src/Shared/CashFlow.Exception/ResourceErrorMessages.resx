@@ -123,6 +123,12 @@
   <data name="EXPENSES_CANNOT_BE_FOR_FUTURE" xml:space="preserve">
     <value>Date must be less than or equal to the current date</value>
   </data>
+  <data name="ITEMS_PER_PAGE_MUST_BE_GREATER_THAN_ZERO" xml:space="preserve">
+    <value>Items per page filter must be greater than 0</value>
+  </data>
+  <data name="PAGE_MUST_BE_GREATER_THAN_ZERO" xml:space="preserve">
+    <value>Page filter must be greater than 0</value>
+  </data>
   <data name="PAYMENT_TYPE_INVALID" xml:space="preserve">
     <value>Payment type is invalid</value>
   </data>

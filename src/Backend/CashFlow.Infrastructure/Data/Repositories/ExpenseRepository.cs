@@ -32,6 +32,18 @@ internal class ExpenseRepository : IExpenseRepository
         return expenseExists;
     }
 
+    public async Task<List<Expense>> GetAllAsync(int page, int itemsPerPage)
+    {
+        var expenses = await _context
+            .Expenses
+            .AsNoTracking()
+            .Skip((page - 1) * itemsPerPage)
+            .Take(itemsPerPage)
+            .ToListAsync();
+
+        return expenses;
+    }
+
     public Task<Expense?> GetByIdAsync(int id)
     {
         throw new NotImplementedException();

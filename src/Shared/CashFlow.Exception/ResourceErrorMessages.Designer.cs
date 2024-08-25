@@ -79,6 +79,24 @@ namespace CashFlow.Exception {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Items per page filter must be greater than 0.
+        /// </summary>
+        public static string ITEMS_PER_PAGE_MUST_BE_GREATER_THAN_ZERO {
+            get {
+                return ResourceManager.GetString("ITEMS_PER_PAGE_MUST_BE_GREATER_THAN_ZERO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Page filter must be greater than 0.
+        /// </summary>
+        public static string PAGE_MUST_BE_GREATER_THAN_ZERO {
+            get {
+                return ResourceManager.GetString("PAGE_MUST_BE_GREATER_THAN_ZERO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Payment type is invalid.
         /// </summary>
         public static string PAYMENT_TYPE_INVALID {
