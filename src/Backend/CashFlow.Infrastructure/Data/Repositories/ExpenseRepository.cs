@@ -44,8 +44,13 @@ internal class ExpenseRepository : IExpenseRepository
         return expenses;
     }
 
-    public Task<Expense?> GetByIdAsync(int id)
+    public async Task<Expense?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        var expense = await _context
+            .Expenses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        return expense;
     }
 }

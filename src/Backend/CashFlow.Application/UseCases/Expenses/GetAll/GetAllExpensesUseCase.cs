@@ -16,7 +16,7 @@ public class GetAllExpensesUseCase : IGetAllExpenses
         _mapper = mapper;
     }
 
-    public async Task<List<ResponseRegisterExpenseJson>> Execute(RequestPaginationJson pagination)
+    public async Task<List<ResponseExpenseJson>> Execute(RequestPaginationJson pagination)
     {
         Validate(pagination);
 
@@ -24,7 +24,7 @@ public class GetAllExpensesUseCase : IGetAllExpenses
             .GetAllAsync(pagination.Page ?? 1, pagination.ItemsPerPage ?? 5);
 
         var response = _mapper
-            .Map<List<ResponseRegisterExpenseJson>>(expenses);
+            .Map<List<ResponseExpenseJson>>(expenses);
 
         return response;
     }

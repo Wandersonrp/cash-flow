@@ -4,5 +4,5 @@ using CashFlow.Communication.Responses.Expenses;
 namespace CashFlow.Application.UseCases.Expenses.GetAll;
 public interface IGetAllExpenses
 {
-    Task<List<ResponseRegisterExpenseJson>> Execute(RequestPaginationJson pagination);
+    Task<List<ResponseExpenseJson>> Execute(RequestPaginationJson pagination);
 }
