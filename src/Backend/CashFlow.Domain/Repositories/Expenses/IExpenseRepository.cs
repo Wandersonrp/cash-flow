@@ -8,4 +8,5 @@ public interface IExpenseRepository
     Task<bool> ExistsAsync(int id);
     Task<Expense> AddAsync(Expense expense);
     Task<List<Expense>> GetAllAsync(int page, int itemsPerPage);
+    Task<bool> DeleteAsync(int id);
 }

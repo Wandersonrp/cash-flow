@@ -23,6 +23,22 @@ internal class ExpenseRepository : IExpenseRepository
         return result.Entity;
     }
 
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var result = await _context
+            .Expenses
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (result is null)
+        {
+            return false;
+        }
+
+        _context.Expenses.Remove(result);
+
+        return true;
+    }
+
     public async Task<bool> ExistsAsync(int id)
     {
         var expenseExists = await _context
