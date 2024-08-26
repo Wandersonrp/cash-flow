@@ -69,4 +69,18 @@ internal class ExpenseRepository : IExpenseRepository
 
         return expense;
     }
+
+    public async Task<Expense?> GetByIdWithTracking(int id)
+    {
+        var expense = await _context
+            .Expenses
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        return expense;
+    }
+
+    public void Update(Expense expense)
+    {
+        _context.Expenses.Update(expense);
+    }
 }

@@ -9,4 +9,6 @@ public interface IExpenseRepository
     Task<Expense> AddAsync(Expense expense);
     Task<List<Expense>> GetAllAsync(int page, int itemsPerPage);
     Task<bool> DeleteAsync(int id);
+    void Update(Expense expense);
+    Task<Expense?> GetByIdWithTracking(int id);
 }

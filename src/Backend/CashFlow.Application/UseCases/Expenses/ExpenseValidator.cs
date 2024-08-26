@@ -2,11 +2,11 @@ using CashFlow.Communication.Requests.Expenses;
 using CashFlow.Exception;
 using FluentValidation;
 
-namespace CashFlow.Application.UseCases.Expenses.Register;
+namespace CashFlow.Application.UseCases.Expenses;
 
-public class RegisterExpenseValidator : AbstractValidator<RequestRegisterExpenseJson>
+public class ExpenseValidator : AbstractValidator<RequestExpenseJson>
 {
-    public RegisterExpenseValidator()
+    public ExpenseValidator()
     {
         RuleFor(x => x.Title)
             .NotEmpty()
@@ -14,14 +14,14 @@ public class RegisterExpenseValidator : AbstractValidator<RequestRegisterExpense
 
         RuleFor(x => x.Date)
             .LessThanOrEqualTo(DateTime.UtcNow)
-            .WithMessage(ResourceErrorMessages.EXPENSES_CANNOT_BE_FOR_FUTURE);    
+            .WithMessage(ResourceErrorMessages.EXPENSES_CANNOT_BE_FOR_FUTURE);
 
         RuleFor(x => x.Amount)
             .GreaterThan(0)
-            .WithMessage(ResourceErrorMessages.AMOUNT_MUST_BE_GREATER_THAN_ZERO);    
+            .WithMessage(ResourceErrorMessages.AMOUNT_MUST_BE_GREATER_THAN_ZERO);
 
         RuleFor(x => x.PaymentType)
             .IsInEnum()
-            .WithMessage(ResourceErrorMessages.PAYMENT_TYPE_INVALID);    
+            .WithMessage(ResourceErrorMessages.PAYMENT_TYPE_INVALID);
     }
 }
