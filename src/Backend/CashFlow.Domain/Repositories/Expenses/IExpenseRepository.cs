@@ -11,4 +11,5 @@ public interface IExpenseRepository
     Task<bool> DeleteAsync(int id);
     void Update(Expense expense);
     Task<Expense?> GetByIdWithTracking(int id);
+    Task<List<Expense>> FilterByMonth(DateOnly date);
 }

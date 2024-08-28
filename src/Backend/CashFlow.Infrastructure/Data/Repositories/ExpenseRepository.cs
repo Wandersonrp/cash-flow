@@ -48,6 +48,23 @@ internal class ExpenseRepository : IExpenseRepository
         return expenseExists;
     }
 
+    public async Task<List<Expense>> FilterByMonth(DateOnly date)
+    {
+        var startDate = new DateTime(year: date.Year, month: date.Month, day: 1, 0, 0, 0, DateTimeKind.Utc).Date;
+
+        var daysInMonth = DateTime.DaysInMonth(year: date.Year, month: date.Month);
+
+        var endDate = new DateTime(year: date.Year, month: date.Month, day: daysInMonth, hour: 23, minute: 59, second: 59, DateTimeKind.Utc);
+
+        return await _context
+            .Expenses
+            .AsNoTracking()
+            .Where(x => x.Date >= startDate && x.Date <= endDate)
+            .OrderBy(x => x.Date)
+            .ThenBy(x => x.Title)
+            .ToListAsync();
+    }
+
     public async Task<List<Expense>> GetAllAsync(int page, int itemsPerPage)
     {
         var expenses = await _context
