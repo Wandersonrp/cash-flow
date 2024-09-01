@@ -1,9 +1,12 @@
 ﻿using CashFlow.Application.UseCases.Reports.Expenses.Pdf.Fonts;
+using CashFlow.Domain.Entities;
 using CashFlow.Domain.Repositories.Expenses;
 using CashFlow.Domain.Resources.Reports;
 using MigraDoc.DocumentObjectModel;
+using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
 using PdfSharp.Fonts;
+using System.Reflection;
 
 namespace CashFlow.Application.UseCases.Reports.Expenses.Pdf;
 public class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdf
@@ -30,16 +33,9 @@ public class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdf
         var document = CreateDocument(month);
         var page = CreatePage(document);
 
-        var paragraph = page.AddParagraph();
-        var title = string.Format(ResourceReportGenerationMessages.TOTAL_SPENT_IN, month.ToString("Y"));
+        CreateHeaderWithProfilePhotoAndName(page);
 
-        paragraph.AddFormattedText(title, new Font { Name = FontHelper.RALEWAY_REGULAR, Size = 15 });
-
-        paragraph.AddLineBreak();
-
-        var totalExpenses = expenses.Sum(expense => expense.Amount);
-
-        paragraph.AddFormattedText($"{CURRENCY_SYMBOL} {totalExpenses}", new Font { Name = FontHelper.WORKSANS_BLACK, Size = 50 });
+        CreateTotalSpentSection(page, month, expenses);
 
         return RenderDocument(document);
     }
@@ -83,5 +79,42 @@ public class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdf
         renderer.PdfDocument.Save(stream);
 
         return stream.ToArray();
+    }
+
+    private void CreateHeaderWithProfilePhotoAndName(Section page)
+    {
+        var table = page.AddTable();
+        table.AddColumn();
+        table.AddColumn("300");
+
+        var row = table.AddRow();
+
+        var assembly = Assembly.GetExecutingAssembly();
+        var directoryName = Path.GetDirectoryName(assembly.Location);
+
+        var pathFile = Path.Combine(directoryName!, "UseCases/Reports/Expenses/Pdf/Logo", "qrcode.png");
+
+        row.Cells[0].AddImage(pathFile);
+
+        row.Cells[1].AddParagraph("Olá, Cash Flow");
+        row.Cells[1].Format.Font = new Font { Name = FontHelper.RALEWAY_BLACK, Size = 16 };
+        row.Cells[1].VerticalAlignment = VerticalAlignment.Center;
+    }
+
+    private void CreateTotalSpentSection(Section page, DateOnly month, List<Expense> expenses)
+    {
+        var paragraph = page.AddParagraph();
+        paragraph.Format.SpaceBefore = 40;
+        paragraph.Format.SpaceAfter = 40;
+
+        var title = string.Format(ResourceReportGenerationMessages.TOTAL_SPENT_IN, month.ToString("Y"));
+
+        paragraph.AddFormattedText(title, new Font { Name = FontHelper.RALEWAY_REGULAR, Size = 15 });
+
+        paragraph.AddLineBreak();
+
+        var totalExpenses = expenses.Sum(expense => expense.Amount);
+
+        paragraph.AddFormattedText($"{CURRENCY_SYMBOL} {totalExpenses}", new Font { Name = FontHelper.WORKSANS_BLACK, Size = 50 });
     }
 }

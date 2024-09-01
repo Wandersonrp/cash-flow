@@ -27,6 +27,16 @@
     <PackageReference Include="PDFsharp-MigraDoc" Version="6.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases\Reports\Expenses\Pdf\Logo\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="UseCases\Reports\Expenses\Pdf\Logo\qrcode.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
