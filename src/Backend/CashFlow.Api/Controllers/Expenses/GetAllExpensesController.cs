@@ -17,7 +17,7 @@ public class GetAllExpensesController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(ResponseExpenseJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<ResponseExpenseJson>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<ResponseExpenseJson>>> GetAll(
         [FromQuery] RequestPaginationJson pagination)
     {

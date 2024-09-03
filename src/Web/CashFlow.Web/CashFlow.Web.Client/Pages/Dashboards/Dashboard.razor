@@ -1,0 +1,102 @@
+﻿@page "/dashboard"
+
+@inject HttpClient HttpClient
+@inject IConfiguration Configuraiton
+
+@using System.Globalization
+
+@layout MainLayout
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="px-8">
+    <MudText Typo="Typo.h3" GutterBottom="true">Dashboard</MudText>
+</div>
+
+<MudContainer Class="mt-10 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 200px;">
+                <div class="d-flex justify-start" style="width: 100%; height: 20%;">
+                    <MudText Typo="Typo.h5">Despesas</MudText>
+                </div>
+                <div class="d-flex align-center justify-center" style="width: 100%; height: 80%;">
+                    <MudText Typo="Typo.h1"  Color="Color.Error">@_totalExpenses</MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 200px;">
+                <div class="d-flex justify-start" style="width: 100%; height: 20%;">
+                    <MudText Typo="Typo.h5">Total de Despesas</MudText>
+                </div>
+                <div class="d-flex align-center justify-center" style="width: 100%; height: 80%;">
+                    <MudText Typo="Typo.h4" Color="Color.Error">@(_sumExpenses.ToString("C", new CultureInfo("pt-BR")))</MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="3">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="3">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private int _totalExpenses { get; set; } = 0;
+    private decimal _sumExpenses { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var tasks = new List<Task>
+        {
+            GetTotalExpenses(),
+            SumExpenses(),
+        };
+
+        await Task.WhenAll(tasks);
+    }
+
+    private async Task SumExpenses()
+    {
+        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuraiton);
+
+        _sumExpenses = await clientFactory.GetFromJsonAsync<decimal>($"{clientFactory.BaseAddress}/expenses/sum");  
+    }
+
+    private async Task GetTotalExpenses()
+    {
+        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuraiton);
+
+        _totalExpenses = await clientFactory.GetFromJsonAsync<int>($"{clientFactory.BaseAddress}/expenses/count");
+    }
+}

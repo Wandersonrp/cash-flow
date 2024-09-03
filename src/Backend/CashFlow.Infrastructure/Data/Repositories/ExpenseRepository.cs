@@ -23,6 +23,15 @@ internal class ExpenseRepository : IExpenseRepository
         return result.Entity;
     }
 
+    public async Task<int> CountAsync()
+    {
+        var count = await _context
+            .Expenses
+            .CountAsync();
+
+        return count;
+    }
+
     public async Task<bool> DeleteAsync(int id)
     {
         var result = await _context
@@ -94,6 +103,13 @@ internal class ExpenseRepository : IExpenseRepository
             .FirstOrDefaultAsync(x => x.Id == id);
 
         return expense;
+    }
+
+    public async Task<decimal> SumTotalAsync()
+    {
+        return await _context
+            .Expenses
+            .SumAsync(x => x.Amount);
     }
 
     public void Update(Expense expense)

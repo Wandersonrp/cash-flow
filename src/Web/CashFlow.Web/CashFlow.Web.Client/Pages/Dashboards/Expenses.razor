@@ -1,0 +1,55 @@
+﻿@page "/despesas"
+
+@using CashFlow.Communication.Responses.Expenses
+
+<PageTitle>Despesas</PageTitle>
+
+@inject IConfiguration Configuration
+
+@layout MainLayout
+
+<div class="px-8">
+    <MudText Typo="Typo.h3" GutterBottom="true">Despesas</MudText>
+</div>
+
+
+<div class="px-8 d-flex flex-column mt-10 gap-5">
+    @foreach(var expense in _expenses)
+    {     
+        <Expense ExpenseTitle="@expense.Title" ExpenseDescription="@expense.Description"/>
+    }
+
+    <MudPagination Color="Color.Primary" Count="@_expenses.Count" SelectedChanged="SelectedChanged" />
+</div>
+
+@code {
+    private List<ResponseExpenseJson> _expenses = new();
+
+    private int _selected = 1;
+    private int _page = 1;
+    private int _itemsPerPage = 3;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllExpenses();
+    }
+
+    private async Task GetAllExpenses()
+    {
+        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+
+        var response = await clientFactory.GetFromJsonAsync<List<ResponseExpenseJson>>($"{clientFactory.BaseAddress}/expenses?page={_page}&itemsPerPage={_itemsPerPage}");
+
+        if(response is not null)
+        {
+            _expenses = response;
+        }
+    }
+
+    private async Task SelectedChanged(int page)
+    {
+        _page = page;
+        
+        await GetAllExpenses();
+    }
+}

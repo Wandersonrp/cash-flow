@@ -1,0 +1,20 @@
+﻿<MudCard Class="d-flex rounded-10 px-3 flex-row" Style="width: 80%;">
+    <MudCardContent Class="">
+        <MudText Typo="Typo.h5">@ExpenseTitle</MudText>
+        <MudText Typo="Typo.body2">@ExpenseDescription</MudText>
+    </MudCardContent>
+    <MudCardActions Class="d-flex gap-3">
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" />
+        <MudFab Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" />
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public string ExpenseTitle { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public string ExpenseDescription { get; set; }
+}

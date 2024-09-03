@@ -12,4 +12,6 @@ public interface IExpenseRepository
     void Update(Expense expense);
     Task<Expense?> GetByIdWithTracking(int id);
     Task<List<Expense>> FilterByMonth(DateOnly date);
+    Task<int> CountAsync();
+    Task<decimal> SumTotalAsync(); 
 }
