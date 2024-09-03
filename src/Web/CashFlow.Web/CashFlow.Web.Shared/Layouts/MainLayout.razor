@@ -4,6 +4,10 @@
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
 <MudLayout>
     <MudAppBar Elevation="1" Dense="true">
         <MudText Typo="Typo.h5" Class="ml-3">Cash Flow</MudText>
@@ -39,7 +43,6 @@
             LayoutProperties = new LayoutProperties()
         };
     }
-
 
     private void DrawerToggle()
     {

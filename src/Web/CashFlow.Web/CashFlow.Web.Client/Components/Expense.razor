@@ -1,20 +1,65 @@
-﻿<MudCard Class="d-flex rounded-10 px-3 flex-row" Style="width: 80%;">
+﻿@using CashFlow.Communication.Responses.Expenses
+
+@inject IConfiguration Configuration
+@inject IDialogService DialogService
+
+<MudCard Class="d-flex rounded-10 px-3 flex-row" Style="width: 80%;">
     <MudCardContent Class="">
         <MudText Typo="Typo.h5">@ExpenseTitle</MudText>
         <MudText Typo="Typo.body2">@ExpenseDescription</MudText>
     </MudCardContent>
-    <MudCardActions Class="d-flex gap-3">
-        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" />
-        <MudFab Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" />
+    <MudCardActions Class="d-flex gap-3">        
+        <MudFab Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" @onclick="OpenDialog" />
     </MudCardActions>
 </MudCard>
 
 @code {
     [Parameter]
     [EditorRequired]
-    public string ExpenseTitle { get; set; }
+    public string ExpenseTitle { get; set; } = string.Empty;
 
     [Parameter]
     [EditorRequired]
-    public string ExpenseDescription { get; set; }
-}
+    public string ExpenseDescription { get; set; } = string.Empty;
+
+    [Parameter]
+    [EditorRequired]
+    public int ExpenseId { get; set; }    
+
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+
+    private async Task DeleteExpense()
+    {
+        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+
+        await clientFactory.DeleteAsync($"{clientFactory.BaseAddress}/expenses/{ExpenseId}");
+
+        await OnDelete.InvokeAsync(ExpenseId);                
+    }
+
+    private async Task OpenDialog()
+    {
+        var parameters = new DialogParameters<Dialog>
+        {
+            { x => x.Title, "Deletar despesa" },
+            { x => x.Content, "Deseja realmente deletar essa despesa?" },
+            { x => x.RefusingText, "Cancelar" },
+            { x => x.AcceptText, "Deletar" },
+            { x => x.Color, Color.Error }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,                        
+        };
+
+        var dialog = await DialogService.ShowAsync<Dialog>("Delete", parameters, options);
+        var dialogResult = await dialog.Result;     
+
+        if(dialogResult is not null && !dialogResult.Canceled)
+        {
+            await DeleteExpense();            
+        }
+    }    
+}    

@@ -54,6 +54,7 @@ if (app.Environment.IsDevelopment())
 
 InitializeDbContext.Initialize(app);
 
+
 app.UseMiddleware<CultureMiddleware>();
 
 app.UseHttpsRedirection();

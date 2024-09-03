@@ -1,6 +1,10 @@
-﻿namespace CashFlow.Communication.Responses.Expenses;
+﻿using CashFlow.Communication.Responses.Pagination;
+
+namespace CashFlow.Communication.Responses.Expenses;
 
 public record ResponseGetAllExpensesJson
 {
-    public ICollection<ResponseExpenseJson> Expenses = new List<ResponseExpenseJson>();
+    public List<ResponseExpenseJson> Expenses {get; set; }= new();
+ 
+    public ResponsePaginationJson Pagination { get; set; } = new();
 }

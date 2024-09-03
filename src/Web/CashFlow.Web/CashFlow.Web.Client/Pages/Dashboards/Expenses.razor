@@ -1,6 +1,12 @@
 ﻿@page "/despesas"
 
+@inject IDialogService DialogService
+
+@using CashFlow.Communication.Enums.Expenses
+@using CashFlow.Communication.Requests.Expenses
 @using CashFlow.Communication.Responses.Expenses
+@using CashFlow.Communication.Responses.Pagination
+@using System.Text.Json
 
 <PageTitle>Despesas</PageTitle>
 
@@ -8,29 +14,37 @@
 
 @layout MainLayout
 
-<div class="px-8">
-    <MudText Typo="Typo.h3" GutterBottom="true">Despesas</MudText>
+<div class="px-8 d-flex align-center" style="width: 100%;">
+    <MudText Typo="Typo.h3" Class="ma-0 pa-0" GutterBottom="true">Despesas</MudText>
+    <MudFab Class="ml-5" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="OpenDialog"/>
 </div>
 
 
 <div class="px-8 d-flex flex-column mt-10 gap-5">
-    @foreach(var expense in _expenses)
-    {     
-        <Expense ExpenseTitle="@expense.Title" ExpenseDescription="@expense.Description"/>
+    @if(_expenses.Count == 0)
+    {
+        <ExpenseSkeleton />
     }
-
-    <MudPagination Color="Color.Primary" Count="@_expenses.Count" SelectedChanged="SelectedChanged" />
+    else
+    {
+        @foreach(var expense in _expenses)
+        {     
+            <Expense ExpenseTitle="@expense.Title" ExpenseDescription="@expense.Description" ExpenseId="@expense.Id" OnDelete="HandleDelete"/>
+        }
+    }
+        
+    <MudPagination Color="Color.Primary" Count="@((int)_pagination.TotalPages)" SelectedChanged="SelectedChanged" />
 </div>
 
-@code {
+@code {  
     private List<ResponseExpenseJson> _expenses = new();
-
     private int _selected = 1;
     private int _page = 1;
     private int _itemsPerPage = 3;
+    private ResponsePaginationJson _pagination = new();
 
     protected override async Task OnInitializedAsync()
-    {
+    {        
         await GetAllExpenses();
     }
 
@@ -38,18 +52,42 @@
     {
         using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
 
-        var response = await clientFactory.GetFromJsonAsync<List<ResponseExpenseJson>>($"{clientFactory.BaseAddress}/expenses?page={_page}&itemsPerPage={_itemsPerPage}");
+        var response = await clientFactory.GetFromJsonAsync<ResponseGetAllExpensesJson>($"{clientFactory.BaseAddress}/expenses?page={_page}&itemsPerPage={_itemsPerPage}");        
 
         if(response is not null)
-        {
-            _expenses = response;
-        }
+        {            
+            _expenses = response.Expenses;
+            _pagination = response.Pagination;                                    
+        }  
     }
-
+    
     private async Task SelectedChanged(int page)
     {
         _page = page;
         
         await GetAllExpenses();
     }
-}
+
+    private void HandleDelete(int expenseId)
+    {
+        var expenseToRemove = _expenses.FirstOrDefault(x => x.Id == expenseId);
+
+        if(expenseToRemove is not null)
+        {
+            _expenses.Remove(expenseToRemove);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task OpenDialog()
+    {    
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,                        
+        };
+
+        var dialog = await DialogService.ShowAsync<RegisterExpense>("Register", options);
+        var dialogResult = await dialog.Result;         
+    }  
+}    

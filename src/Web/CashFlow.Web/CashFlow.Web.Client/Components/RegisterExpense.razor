@@ -1,0 +1,41 @@
+@using CashFlow.Communication.Requests.Expenses
+
+@inject ISnackbar Snackbar
+@inject IConfiguration Configuration
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1"/>
+            Criar nova despesa
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" Value="@Expense.Title" Label="Título *"/>
+        <MudTextField Variant="Variant.Outlined" Value="@Expense.Description" Label="Descrição"/>
+        <MudTextField Variant="Variant.Outlined" Value="@Expense.Amount" Label="Valor *"/>
+        <MudTextField Variant="Variant.Outlined" Value="@Expense.Date" Label="Data *"/>
+        <MudTextField Variant="Variant.Outlined" Value="@Expense.PaymentType" Label="Tipo do pagamento *"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="RegisterExpenseAsync">Cadastrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = new();
+    
+    public RequestExpenseJson Expense { get; set; } = new();
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task RegisterExpenseAsync()
+    {
+        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);        
+
+        Snackbar.Add("Despesa criada", Severity.Success);        
+        MudDialog.Close(DialogResult.Ok(Expense.Title));
+    }
+}

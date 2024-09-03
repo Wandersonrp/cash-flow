@@ -17,12 +17,21 @@ public class GetAllExpensesController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<ResponseExpenseJson>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<ResponseExpenseJson>>> GetAll(
-        [FromQuery] RequestPaginationJson pagination)
+    [ProducesResponseType(typeof(ResponseGetAllExpensesJson), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ResponseGetAllExpensesJson>> GetAll(
+        [FromQuery] int? page, 
+        [FromQuery] int? itemsPerPage)
     {
-        var result = await _useCase.Execute(pagination);
+        var result = await _useCase.Execute(new RequestPaginationJson
+        {
+            Page = page ?? 1,
+            ItemsPerPage = itemsPerPage ?? 5,
+        });        
 
-        return Ok(result);
+        return Ok(new 
+        {
+            result.Expenses,
+            result.Pagination
+        });
     }
 }

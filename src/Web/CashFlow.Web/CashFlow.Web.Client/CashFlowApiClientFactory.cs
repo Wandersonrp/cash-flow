@@ -6,6 +6,8 @@ public static class CashFlowApiClientFactory
     {
         var cashFlowApiBaseAddress = configuration["AppSettings:CashFlowApiUrl"] ?? throw new InvalidOperationException("Provide an api url");       
 
+        
+
         return new HttpClient { BaseAddress = new Uri(cashFlowApiBaseAddress) };
     }
 }
