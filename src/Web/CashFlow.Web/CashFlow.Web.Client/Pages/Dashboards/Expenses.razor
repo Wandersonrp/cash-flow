@@ -28,15 +28,15 @@
     else
     {
         @foreach(var expense in _expenses)
-        {     
-            <Expense ExpenseTitle="@expense.Title" ExpenseDescription="@expense.Description" ExpenseId="@expense.Id" OnDelete="HandleDelete"/>
+        {
+            <Expense ExpenseTitle="@expense.Title" ExpenseDescription="@expense.Description" ExpenseId="@expense.Id" OnDelete="HandleDelete" ExpenseAmount="expense.Amount" />
         }
     }
         
     <MudPagination Color="Color.Primary" Count="@((int)_pagination.TotalPages)" SelectedChanged="SelectedChanged" />
 </div>
 
-@code {  
+@code {
     private List<ResponseExpenseJson> _expenses = new();
     private int _selected = 1;
     private int _page = 1;
@@ -52,7 +52,7 @@
     {
         using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
 
-        var response = await clientFactory.GetFromJsonAsync<ResponseGetAllExpensesJson>($"{clientFactory.BaseAddress}/expenses?page={_page}&itemsPerPage={_itemsPerPage}");        
+        var response = await clientFactory.GetFromJsonAsync<ResponseGetAllExpensesJson>($"{clientFactory.BaseAddress}/expenses?page={_page}&itemsPerPage={_itemsPerPage}");      
 
         if(response is not null)
         {            
@@ -60,11 +60,11 @@
             _pagination = response.Pagination;                                    
         }  
     }
-    
+
     private async Task SelectedChanged(int page)
     {
         _page = page;
-        
+
         await GetAllExpenses();
     }
 
@@ -80,6 +80,13 @@
         StateHasChanged();
     }
 
+    private async Task HandleRegister()
+    {
+        await GetAllExpenses();       
+
+        StateHasChanged();
+    }
+
     private async Task OpenDialog()
     {    
         var options = new DialogOptions
@@ -87,7 +94,13 @@
             CloseOnEscapeKey = true,                        
         };
 
-        var dialog = await DialogService.ShowAsync<RegisterExpense>("Register", options);
+        var parameters = new DialogParameters<RegisterExpense>
+        {
+            { x => x.OnRegister, EventCallback.Factory.Create(this, HandleRegister)}
+        };
+
+        var dialog = await DialogService.ShowAsync<RegisterExpense>("Register", parameters, options);
+
         var dialogResult = await dialog.Result;         
     }  
 }    

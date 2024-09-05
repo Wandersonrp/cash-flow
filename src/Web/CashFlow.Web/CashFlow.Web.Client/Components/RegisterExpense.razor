@@ -1,41 +1,108 @@
+﻿@using CashFlow.Communication.Enums.Expenses
 @using CashFlow.Communication.Requests.Expenses
+@using CashFlow.Web.Client.StringConverters
+@using CashFlow.Web.Shared.Validators
+@using System.Globalization
 
 @inject ISnackbar Snackbar
 @inject IConfiguration Configuration
 
-<MudDialog>
+<MudDialog Style="min-width: 500px; padding: 1rem;">
     <TitleContent>
         <MudText Typo="Typo.h6">
             <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1"/>
             Criar nova despesa
         </MudText>
     </TitleContent>
-    <DialogContent>
-        <MudTextField Variant="Variant.Outlined" Value="@Expense.Title" Label="Título *"/>
-        <MudTextField Variant="Variant.Outlined" Value="@Expense.Description" Label="Descrição"/>
-        <MudTextField Variant="Variant.Outlined" Value="@Expense.Amount" Label="Valor *"/>
-        <MudTextField Variant="Variant.Outlined" Value="@Expense.Date" Label="Data *"/>
-        <MudTextField Variant="Variant.Outlined" Value="@Expense.PaymentType" Label="Tipo do pagamento *"/>
+    <DialogContent >
+        <MudForm Model="@Expense" @ref="_form" Validation="@(_expenseValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent Class="d-flex flex-column gap-5">
+                <MudTextField @bind-Value="Expense.Title" 
+                              For="@(() => Expense.Title)"                              
+                              Label="Título" 
+                              Placeholder="Cinema" 
+                              Immediate="true" />
+                    
+                <MudTextField @bind-Value="Expense.Description"
+                              For="@(() => Expense.Description)"
+                              Label="Descrição"
+                              Placeholder="Ida ao cinema do fim de semana"
+                              Immediate="true" />
+
+                <MudTextField @bind-Value="Expense.Amount"
+                              For="@(() => Expense.Amount)"
+                              Label="Valor"
+                              Placeholder="R$ 150,00" 
+                              Format="N2"
+                              Immediate="true" />
+
+                <MudDatePicker PickerVariant="PickerVariant.Dialog" DateFormat="dd/MM/yyyy" Label="Data" @bind-Date="_date"  />
+
+                <MudSelect @bind-Value="_paymentType" Label="Tipo de pagamento" OpenIcon="@Icons.Material.Filled.AccountBalanceWallet" AdornmentColor="Color.Secondary">
+                    @foreach (PaymentType item in Enum.GetValues(typeof(PaymentType)))
+                    {
+                        <MudSelectItem Value="@item">@(FormatPaymentType.ToFriendlyString(@item))</MudSelectItem>
+                    }
+                </MudSelect>
+
+            </MudCardContent>
+        </MudForm>        
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="RegisterExpenseAsync">Cadastrar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RegisterExpenseAsync">Cadastrar</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = new();
-    
+
     public RequestExpenseJson Expense { get; set; } = new();
+
+    private MudForm _form { get; set; } = new();
+
+    private ExpenseFluentValidator _expenseValidator = new();
+
+    private string _amount { get; set; } = "0.00";
+
+    private DateTime? _date = DateTime.Today.ToUniversalTime();
 
     private void Cancel() => MudDialog.Cancel();
 
+    private PaymentType _paymentType { get; set; } = PaymentType.Cash;
+
+    [Parameter]
+    public EventCallback OnRegister { get; set; }
+
+
     private async Task RegisterExpenseAsync()
     {
-        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);        
+        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
 
-        Snackbar.Add("Despesa criada", Severity.Success);        
-        MudDialog.Close(DialogResult.Ok(Expense.Title));
-    }
+        Expense.Date = _date.Value;               
+
+        try
+        {
+            await _form.Validate();            
+
+            var result = await clientFactory.PostAsJsonAsync<RequestExpenseJson>($"{clientFactory.BaseAddress}/expenses", Expense);
+
+            if (result.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Despesa cadastrada com sucesso", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(Expense.Title));
+
+                await OnRegister.InvokeAsync();
+            }
+        } 
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+
+            Snackbar.Add("Ocorreu um erro ao cadastrar a despesa", Severity.Error);
+            MudDialog.Close(DialogResult.Ok(Expense.Title));
+        }                      
+    }            
 }
