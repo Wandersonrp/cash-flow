@@ -29,7 +29,7 @@
     {
         @foreach(var expense in _expenses)
         {
-            <Expense ExpenseTitle="@expense.Title" ExpenseDescription="@expense.Description" ExpenseId="@expense.Id" OnDelete="HandleDelete" ExpenseAmount="expense.Amount" />
+            <Expense ExpenseResponse="@expense" OnDelete="HandleDelete" />
         }
     }
         
@@ -55,7 +55,7 @@
         var response = await clientFactory.GetFromJsonAsync<ResponseGetAllExpensesJson>($"{clientFactory.BaseAddress}/expenses?page={_page}&itemsPerPage={_itemsPerPage}");      
 
         if(response is not null)
-        {            
+        {
             _expenses = response.Expenses;
             _pagination = response.Pagination;                                    
         }  
@@ -83,6 +83,13 @@
     private async Task HandleRegister()
     {
         await GetAllExpenses();       
+
+        StateHasChanged();
+    }
+
+    private async Task HandleUpdate()
+    {
+        await GetAllExpenses();
 
         StateHasChanged();
     }

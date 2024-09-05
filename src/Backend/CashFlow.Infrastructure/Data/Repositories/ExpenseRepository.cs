@@ -81,8 +81,9 @@ internal class ExpenseRepository : IExpenseRepository
         var expenses = await _context
             .Expenses
             .AsNoTracking()
+            .OrderByDescending(x => x.Date)
             .Skip((page - 1) * itemsPerPage)
-            .Take(itemsPerPage)
+            .Take(itemsPerPage)           
             .ToListAsync();          
 
         return (expenses, count);

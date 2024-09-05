@@ -1,0 +1,105 @@
+﻿@using CashFlow.Communication.Enums.Expenses
+@using CashFlow.Communication.Requests.Expenses
+@using CashFlow.Communication.Responses.Expenses
+@using CashFlow.Web.Client.StringConverters
+@using CashFlow.Web.Shared.Validators
+
+@inject ISnackbar Snackbar
+@inject IConfiguration Configuration
+
+<MudDialog Style="min-width: 500px; padding: 1rem;">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3 mb-n1" />
+            Atualizar despesa
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Model="@Expense" @ref="_form" Validation="@(_expenseValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent Class="d-flex flex-column gap-5">
+                <MudTextField @bind-Value="Expense.Title"
+                              For="@(() => Expense.Title)"
+                              Label="Título"                              
+                              Placeholder="Cinema"
+                              Immediate="true" />
+
+                <MudTextField @bind-Value="Expense.Description"
+                              For="@(() => Expense.Description)"
+                              Label="Descrição"
+                              Placeholder="Ida ao cinema do fim de semana"
+                              Immediate="true" />
+
+                <MudTextField @bind-Value="Expense.Amount"
+                              For="@(() => Expense.Amount)"
+                              Label="Valor"
+                              Placeholder="R$ 150,00"
+                              Format="N2"
+                              Immediate="true" />
+
+                <MudDatePicker PickerVariant="PickerVariant.Dialog" DateFormat="dd/MM/yyyy" Label="Data" @bind-Date="_date" />
+
+                <MudSelect @bind-Value="_paymentType" Label="Tipo de pagamento" OpenIcon="@Icons.Material.Filled.AccountBalanceWallet" AdornmentColor="Color.Secondary">
+                    @foreach (PaymentType item in Enum.GetValues(typeof(PaymentType)))
+                    {
+                        <MudSelectItem Value="@item">@(FormatPaymentType.ToFriendlyString(@item))</MudSelectItem>
+                    }
+                </MudSelect>
+
+            </MudCardContent>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateExpenseAsync">Atualizar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = new();
+
+    [Parameter]
+    public RequestExpenseJson Expense { get; set; } = new();
+
+    [Parameter]
+    public int ExpenseId { get; set; }
+
+    private ExpenseFluentValidator _expenseValidator = new();
+
+    private MudForm _form { get; set; } = new();
+
+    private string _amount { get; set; } = "0.00";
+
+    private DateTime? _date = DateTime.Today.ToUniversalTime();
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private PaymentType _paymentType { get; set; } = PaymentType.Cash;
+
+    [Parameter]
+    public EventCallback OnUpdate { get; set; }
+
+    private async Task UpdateExpenseAsync()
+    {
+        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+
+        Expense.Date = _date.Value;
+
+        try
+        {            
+            var response = await clientFactory.PutAsJsonAsync<RequestExpenseJson>($"{clientFactory.BaseAddress}/expenses/{ExpenseId}", Expense);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Despesa atualizada com sucesso!", Severity.Success);
+                await OnUpdate.InvokeAsync();
+                MudDialog.Close();
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            Snackbar.Add("Erro ao atualizar despesa!", Severity.Error);
+        }
+    }
+}

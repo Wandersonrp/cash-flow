@@ -25,7 +25,7 @@
 
     private IComponentRenderMode? GetRenderModeForPage()
     {
-        InteractiveServerRenderMode? renderMode = HttpContext.Request.Path.StartsWithSegments("/Error") ? null : new InteractiveServerRenderMode(false);
+        var renderMode = HttpContext.Request.Path.StartsWithSegments("/Error") ? null : new InteractiveServerRenderMode(false);
 
         // Generic Pages should be SSR
         if (HttpContext.Request.Path.Equals("/Error"))
