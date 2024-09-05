@@ -23,6 +23,8 @@ public class CultureMiddleware
             .AcceptLanguage
             .FirstOrDefault();
 
+        Console.WriteLine($"Requested culture: {requestedCulture}");    
+
         var cultureInfo = new CultureInfo("en");
 
         if(!string.IsNullOrWhiteSpace(requestedCulture) 

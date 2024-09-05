@@ -8,15 +8,17 @@
 @using CashFlow.Communication.Responses.Pagination
 @using System.Text.Json
 
-<PageTitle>Despesas</PageTitle>
-
 @inject IConfiguration Configuration
 
 @layout MainLayout
 
-<div class="px-8 d-flex align-center" style="width: 100%;">
-    <MudText Typo="Typo.h3" Class="ma-0 pa-0" GutterBottom="true">Despesas</MudText>
-    <MudFab Class="ml-5" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="OpenDialog"/>
+<PageTitle>Despesas</PageTitle>
+
+<div class="px-8 d-flex align-center justify-space-between" style="width: 80%;">
+    <div class="d-flex align-center">
+        <MudText Typo="Typo.h3" Class="ma-0 pa-0" GutterBottom="true">Despesas</MudText>
+        <MudFab Class="ml-5" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="OpenDialog"/>
+    </div>      
 </div>
 
 
@@ -42,6 +44,11 @@
     private int _page = 1;
     private int _itemsPerPage = 3;
     private ResponsePaginationJson _pagination = new();
+
+    private DialogOptions _options = new DialogOptions
+    {
+        CloseOnEscapeKey = true,        
+    };
 
     protected override async Task OnInitializedAsync()
     {        
@@ -95,19 +102,14 @@
     }
 
     private async Task OpenDialog()
-    {    
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,                        
-        };
-
+    {          
         var parameters = new DialogParameters<RegisterExpense>
         {
             { x => x.OnRegister, EventCallback.Factory.Create(this, HandleRegister)}
         };
 
-        var dialog = await DialogService.ShowAsync<RegisterExpense>("Register", parameters, options);
+        var dialog = await DialogService.ShowAsync<RegisterExpense>("Register", parameters, _options);
 
         var dialogResult = await dialog.Result;         
-    }  
+    }      
 }    

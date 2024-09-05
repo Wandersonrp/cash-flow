@@ -10,6 +10,4 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(cashFlow
 
 builder.Services.AddMudServices();
 
-builder.Services.AddScoped<IExpenseService, ExpenseService>();
-
 await builder.Build().RunAsync();

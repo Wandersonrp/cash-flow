@@ -1,4 +1,5 @@
 using CashFlow.Web.Components;
+using Microsoft.JSInterop;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,8 @@ builder.Services.AddHttpClient("CashFlow.Api", client =>
 {
     client.BaseAddress = new Uri(cashFlowApiBaseUrl);
 });
+
+//builder.Services.AddScoped<IJSRuntime, JSRuntime>();
 
 var app = builder.Build();
 

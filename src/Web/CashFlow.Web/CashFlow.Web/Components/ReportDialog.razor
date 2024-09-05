@@ -1,0 +1,58 @@
+@using CashFlow.Web.Client.Enums
+@using CashFlow.Web.Client.StringConverters
+@using System.Net.Http.Headers
+@using CashFlow.Web.StringConverter
+
+@inject IConfiguration Configuration
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+<MudDialog Style="min-width: 500px; padding: 1rem;">
+    <TitleContent>
+        Selecione o mês do relatório
+    </TitleContent>
+    <DialogContent>
+        <div class="d-flex flex-column gap-3">
+            <MudDatePicker Label="Selecione um mês" @bind-Date="_date" DateFormat="dd/MM/yyyy" PickerVariant="PickerVariant.Inline"/>
+            <MudRadioGroup @bind-Value="_reportFileType">
+                <MudRadio Value="@(ReportFileType.Pdf)" Color="Color.Primary">PDF</MudRadio>
+                <MudRadio Value="@(ReportFileType.Excel)" Color="Color.Secondary">Excel</MudRadio>
+            </MudRadioGroup>
+        </div>    
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Class="px-5" Color="Color.Primary" Variant="Variant.Filled" OnClick="GenerateReport">Gerar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = new();
+    private void Cancel() => MudDialog.Cancel();
+    private DateTime? _date = DateTime.Today;
+    private ReportFileType _reportFileType { get; set; }
+
+    private async Task GenerateReport()
+    {
+        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+        
+        try 
+        {
+            var response = await clientFactory.GetStreamAsync($"{clientFactory.BaseAddress}/reports/expenses/{FormatReportFileType.ToFriendlyString(_reportFileType)}?month={DateOnly.FromDateTime(_date ?? DateTime.Now).ToString("Y")}");
+
+            using var streamRef = new DotNetStreamReference(response);
+
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Relatório_{DateOnly.FromDateTime(_date ?? DateTime.Now).ToString("Y")}.{FormatReportFileType.ToFriendlyString(_reportFileType)}", streamRef);            
+
+            MudDialog.Close();
+            
+        } 
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.Message);            
+        }        
+    }      
+}    
