@@ -28,12 +28,11 @@ public class CultureMiddleware
         if(!string.IsNullOrWhiteSpace(requestedCulture) 
             && supportedLanguages.Exists(x => x.Name.Equals(requestedCulture)))
         {
-            cultureInfo = new CultureInfo(requestedCulture);
-            Console.WriteLine($"Culture => {cultureInfo.Name}");
+            cultureInfo = new CultureInfo(requestedCulture);           
         }
 
-        CultureInfo.CurrentCulture = cultureInfo;
-        CultureInfo.CurrentUICulture = cultureInfo;      
+        CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+        CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;      
 
         await _next(context);
     }

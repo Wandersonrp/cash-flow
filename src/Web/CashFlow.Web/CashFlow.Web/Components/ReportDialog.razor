@@ -3,6 +3,7 @@
 @using System.Net.Http.Headers
 @using CashFlow.Web.StringConverter
 @using System.Globalization
+@using System.Net
 
 @inject IConfiguration Configuration
 @inject IJSRuntime JSRuntime
@@ -30,7 +31,7 @@
 </MudDialog>
 
 @code {
-    
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = new();
     private void Cancel() => MudDialog.Cancel();
@@ -41,7 +42,7 @@
     private async Task GenerateReport()
     {
         using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
-        
+
         try 
         {
             var cultureName = _cultureInfo.Name;            
@@ -49,17 +50,25 @@
             clientFactory.DefaultRequestHeaders.AcceptLanguage.Clear();
             clientFactory.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(cultureName));
 
-            var response = await clientFactory.GetStreamAsync($"{clientFactory.BaseAddress}/reports/expenses/{FormatReportFileType.ToFriendlyString(_reportFileType)}?month={DateOnly.FromDateTime(_date ?? DateTime.Now).ToString("Y")}");
+            var response = await clientFactory.GetAsync($"{clientFactory.BaseAddress}/reports/expenses/{FormatReportFileType.ToFriendlyString(_reportFileType)}?month={DateOnly.FromDateTime(_date ?? DateTime.Now).ToString("yyyy-MM")}");           
 
-            using var streamRef = new DotNetStreamReference(response);
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+                using var streamRef = new DotNetStreamReference(stream);
 
-            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Relatório_{DateOnly.FromDateTime(_date ?? DateTime.Now).ToString("Y")}.{FormatReportFileType.ToFriendlyString(_reportFileType)}", streamRef);            
+                await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Relatório_{DateOnly.FromDateTime(_date ?? DateTime.Now).ToString("Y")}.{FormatReportFileType.ToFriendlyString(_reportFileType)}", streamRef);
 
-            MudDialog.Close();            
+                MudDialog.Close();
+            }        
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                Snackbar.Add("Nenhum dado encontrado para o mês selecionado", Severity.Warning);
+            }
+                        
         } 
         catch(Exception ex)
-        {
-            Console.WriteLine(ex.Message); 
+        {                
             Snackbar.Add("Ocorreu um erro ao gerar o relatório", Severity.Error);           
         }        
     }      

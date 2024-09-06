@@ -12,7 +12,7 @@ public class ExpenseReportsController : ControllerBase
     [HttpGet]
     [Route("excel")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetExcel([FromQuery] DateOnly month, [FromServices] IGenerateExpensesReportExcel useCase)
     {
         var file = await useCase.Execute(month);
@@ -22,13 +22,13 @@ public class ExpenseReportsController : ControllerBase
             return File(file, MediaTypeNames.Application.Octet, "report.xlsx");
         }
 
-        return NoContent();
+        return NotFound();
     }
 
     [HttpGet]
     [Route("pdf")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPdf([FromQuery] DateOnly month, [FromServices] IGenerateExpensesReportPdf useCase)
     {
         var file = await useCase.Execute(month);
@@ -38,6 +38,6 @@ public class ExpenseReportsController : ControllerBase
             return File(file, MediaTypeNames.Application.Pdf, "report.pdf");
         }
 
-        return NoContent();
+        return NotFound();
     }
 }
