@@ -43,6 +43,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+builder.Services.AddLocalization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,8 +57,12 @@ if (app.Environment.IsDevelopment())
 
 InitializeDbContext.Initialize(app);
 
-
 app.UseMiddleware<CultureMiddleware>();
+
+app.UseRequestLocalization(new RequestLocalizationOptions()
+    .AddSupportedCultures(new[] { "en", "pt-BR", "pt-PT" })
+    .AddSupportedUICultures(new[] { "en", "pt-BR", "pt-PT" })
+);
 
 app.UseHttpsRedirection();
 
@@ -64,7 +71,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
 
 internal static class InitializeDbContext
 {    

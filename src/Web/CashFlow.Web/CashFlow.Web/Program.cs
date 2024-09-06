@@ -1,4 +1,5 @@
 using CashFlow.Web.Components;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.JSInterop;
 using MudBlazor.Services;
 
@@ -20,7 +21,7 @@ builder.Services.AddHttpClient("CashFlow.Api", client =>
     client.BaseAddress = new Uri(cashFlowApiBaseUrl);
 });
 
-//builder.Services.AddScoped<IJSRuntime, JSRuntime>();
+builder.Services.AddLocalization();
 
 var app = builder.Build();
 
@@ -40,6 +41,11 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseRequestLocalization(new RequestLocalizationOptions()
+    .AddSupportedCultures(new[] { "en", "pt-BR", "pt-PT" })
+    .AddSupportedUICultures(new[] { "en", "pt-BR", "pt-PT" })
+);
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

@@ -1,4 +1,5 @@
-﻿using CashFlow.Application.UseCases.Reports.Expenses.Pdf.Fonts;
+﻿using CashFlow.Application.UseCases.Reports.Expenses.Pdf.Colors;
+using CashFlow.Application.UseCases.Reports.Expenses.Pdf.Fonts;
 using CashFlow.Domain.Entities;
 using CashFlow.Domain.Repositories.Expenses;
 using CashFlow.Domain.Resources.Reports;
@@ -36,6 +37,49 @@ public class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdf
         CreateHeaderWithProfilePhotoAndName(page);
 
         CreateTotalSpentSection(page, month, expenses);
+
+        foreach(var expense in expenses)
+        {
+            var table = CreateExpenseTable(page);
+
+            var row = table.AddRow();
+            row.Height = 25;
+
+            row.Cells[0].AddParagraph(expense.Title);
+            row.Cells[0].Format.Font = new Font { Name = FontHelper.RALEWAY_BLACK, Size = 14, Color = ColorsHelper.BLACK };
+            row.Cells[0].Shading.Color = ColorsHelper.RED_LIGHT;
+            row.Cells[0].VerticalAlignment = VerticalAlignment.Center;
+            row.Cells[0].MergeRight = 2;
+            row.Cells[0].Format.LeftIndent = 20;
+
+            row.Cells[3].AddParagraph(ResourceReportGenerationMessages.AMOUNT);
+            row.Cells[3].Format.Font = new Font { Name = FontHelper.RALEWAY_BLACK, Size = 14, Color = ColorsHelper.WHITE };
+            row.Cells[3].Shading.Color = ColorsHelper.RED_DARK;
+            row.Cells[3].VerticalAlignment = VerticalAlignment.Center;
+
+            row = table.AddRow();
+            row.Height = 25;
+
+            row.Cells[0].AddParagraph(expense.Date.ToString("dd/MM/yyyy"));
+            row.Cells[0].Format.Font = new Font { Name = FontHelper.WORKSANS_REGULAR, Size = 12, Color = ColorsHelper.BLACK };
+            row.Cells[0].Shading.Color = ColorsHelper.GREEN_DARK;
+            row.Cells[0].VerticalAlignment = VerticalAlignment.Center;
+            row.Cells[0].Format.LeftIndent = 20;
+
+            row.Cells[1].AddParagraph(expense.Date.ToString("t"));
+            row.Cells[1].Format.Font = new Font { Name = FontHelper.WORKSANS_REGULAR, Size = 12, Color = ColorsHelper.BLACK };
+            row.Cells[1].Shading.Color = ColorsHelper.GREEN_DARK;
+            row.Cells[1].VerticalAlignment = VerticalAlignment.Center;       
+
+            row.Cells[3].AddParagraph($"{CURRENCY_SYMBOL} -{expense.Amount}");
+            row.Cells[3].Format.Font = new Font { Name = FontHelper.WORKSANS_REGULAR, Size = 14, Color = ColorsHelper.BLACK };
+            row.Cells[3].Shading.Color = ColorsHelper.GREEN_DARK;
+            row.Cells[3].VerticalAlignment = VerticalAlignment.Center;        
+
+            row = table.AddRow();
+            row.Height = 30;
+            row.Borders.Visible = false;
+        }
 
         return RenderDocument(document);
     }
@@ -116,5 +160,19 @@ public class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdf
         var totalExpenses = expenses.Sum(expense => expense.Amount);
 
         paragraph.AddFormattedText($"{CURRENCY_SYMBOL} {totalExpenses}", new Font { Name = FontHelper.WORKSANS_BLACK, Size = 50 });
+    }
+
+    private Table CreateExpenseTable(Section page)
+    {
+        var table = page.AddTable();
+
+        table.AddColumn("195").Format.Alignment = ParagraphAlignment.Left;            
+        table.AddColumn("80").Format.Alignment = ParagraphAlignment.Center;
+        table.AddColumn("120").Format.Alignment = ParagraphAlignment.Center;
+        table.AddColumn("120").Format.Alignment = ParagraphAlignment.Right;
+
+
+
+        return table;
     }
 }

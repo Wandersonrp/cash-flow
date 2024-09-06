@@ -16,14 +16,12 @@ public class CultureMiddleware
         var supportedLanguages = CultureInfo
             .GetCultures(CultureTypes.AllCultures)
             .ToList();
-
+       
         var requestedCulture = context
             .Request
             .Headers
             .AcceptLanguage
-            .FirstOrDefault();
-
-        Console.WriteLine($"Requested culture: {requestedCulture}");    
+            .FirstOrDefault();           
 
         var cultureInfo = new CultureInfo("en");
 
@@ -31,10 +29,11 @@ public class CultureMiddleware
             && supportedLanguages.Exists(x => x.Name.Equals(requestedCulture)))
         {
             cultureInfo = new CultureInfo(requestedCulture);
+            Console.WriteLine($"Culture => {cultureInfo.Name}");
         }
 
         CultureInfo.CurrentCulture = cultureInfo;
-        CultureInfo.CurrentUICulture = cultureInfo;
+        CultureInfo.CurrentUICulture = cultureInfo;      
 
         await _next(context);
     }

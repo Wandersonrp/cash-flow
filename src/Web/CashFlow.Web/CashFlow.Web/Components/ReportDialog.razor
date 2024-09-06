@@ -2,9 +2,11 @@
 @using CashFlow.Web.Client.StringConverters
 @using System.Net.Http.Headers
 @using CashFlow.Web.StringConverter
+@using System.Globalization
 
 @inject IConfiguration Configuration
 @inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
 
 @rendermode InteractiveServer
 
@@ -34,6 +36,7 @@
     private void Cancel() => MudDialog.Cancel();
     private DateTime? _date = DateTime.Today;
     private ReportFileType _reportFileType { get; set; }
+    private CultureInfo _cultureInfo  = CultureInfo.CurrentCulture;
 
     private async Task GenerateReport()
     {
@@ -41,18 +44,23 @@
         
         try 
         {
+            var cultureName = _cultureInfo.Name;            
+
+            clientFactory.DefaultRequestHeaders.AcceptLanguage.Clear();
+            clientFactory.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(cultureName));
+
             var response = await clientFactory.GetStreamAsync($"{clientFactory.BaseAddress}/reports/expenses/{FormatReportFileType.ToFriendlyString(_reportFileType)}?month={DateOnly.FromDateTime(_date ?? DateTime.Now).ToString("Y")}");
 
             using var streamRef = new DotNetStreamReference(response);
 
             await JSRuntime.InvokeVoidAsync("downloadFileFromStream", $"Relatório_{DateOnly.FromDateTime(_date ?? DateTime.Now).ToString("Y")}.{FormatReportFileType.ToFriendlyString(_reportFileType)}", streamRef);            
 
-            MudDialog.Close();
-            
+            MudDialog.Close();            
         } 
         catch(Exception ex)
         {
-            Console.WriteLine(ex.Message);            
+            Console.WriteLine(ex.Message); 
+            Snackbar.Add("Ocorreu um erro ao gerar o relatório", Severity.Error);           
         }        
     }      
-}    
+}     
