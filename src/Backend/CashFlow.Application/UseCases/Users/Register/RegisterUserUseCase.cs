@@ -13,7 +13,7 @@ public class RegisterUserUseCase : IRegisterUser
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly IPasswordEncrypter _passwordEncrypter;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;    
 
     public RegisterUserUseCase(
         IUserRepository userRepository, 
@@ -24,7 +24,7 @@ public class RegisterUserUseCase : IRegisterUser
         _userRepository = userRepository;
         _mapper = mapper;
         _passwordEncrypter = passwordEncrypter;
-        _unitOfWork = unitOfWork;
+        _unitOfWork = unitOfWork;        
     }
 
     public async Task Execute(RequestRegisterUserJson request)

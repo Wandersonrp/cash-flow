@@ -1,5 +1,6 @@
 ﻿using CashFlow.Application.UseCases.Expenses.Delete;
 using CashFlow.Communication.Responses.Errors;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers.Expenses;
@@ -17,6 +18,7 @@ public class DeleteExpenseController : ControllerBase
 
     [HttpDelete]
     [Route("{id}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete([FromRoute] int id)

@@ -2,6 +2,7 @@ using CashFlow.Application.UseCases.Expenses.Register;
 using CashFlow.Communication.Requests.Expenses;
 using CashFlow.Communication.Responses.Errors;
 using CashFlow.Communication.Responses.Expenses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers.Expenses;
@@ -18,6 +19,7 @@ public class RegisterExpenseController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(ResponseRegisterExpenseJson), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ResponseRegisterExpenseJson>> Register([FromBody] RequestExpenseJson request)

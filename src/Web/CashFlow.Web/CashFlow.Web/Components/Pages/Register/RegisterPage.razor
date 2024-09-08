@@ -22,28 +22,28 @@
         <MudCardHeader Class="d-flex pa-2 justify-center">
             <MudText Typo="Typo.h5" Class="mb-0">Cadastre-se</MudText>
         </MudCardHeader>
-        <MudForm Class="d-flex flex-column gap-5" Model="@Expense" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+        <MudForm Class="d-flex flex-column gap-5" Model="@User" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
             <MudCardContent Class="d-flex flex-column gap-3 px-3">
-                <MudTextField @bind-Value="Expense.Name" 
-                              For="@(() => Expense.Name)" 
+                <MudTextField @bind-Value="User.Name"
+                              For="@(() => User.Name)"
                               Immediate="true" 
                               Label="Nome completo" />
 
-                <MudTextField @bind-Value="Expense.Email"
-                              For="@(() => Expense.Email)"
+                <MudTextField @bind-Value="User.Email"
+                              For="@(() => User.Email)"
                               InputType="InputType.Email"
                               Immediate="true"
                               Label="E-mail" />
 
-                <MudTextField @bind-Value="Expense.Password"
-                              For="@(() => Expense.Password)"
+                <MudTextField @bind-Value="User.Password"
+                              For="@(() => User.Password)"
                               InputType="InputType.Password"
                               Immediate="true"
                               Label="Senha" />        
             </MudCardContent>
             <div class="d-flex flex-column px-2 gap-3 justify-center" style="width: 100%;">
                 <MudButton Class="pa-2" OnClick="@(async () => await Register())" Variant="Variant.Filled" Color="Color.Primary">Cadastrar</MudButton>
-                <MudLink Typo="Typo.subtitle1" Class="d-flex justify-center" Href="/login">Login</MudLink>
+                <MudLink Typo="Typo.subtitle1" Class="d-flex justify-center" Href="/login">Já possui uma conta? Entrar</MudLink>
             </div>
         </MudForm>
     </MudCard>
@@ -53,7 +53,7 @@
 
     private MudForm _form = new();
     private RegisterUserFluentValidator _validator = new();
-    private RequestRegisterUserJson Expense { get; set; } = new();
+    private RequestRegisterUserJson User { get; set; } = new();
     private CultureInfo _cultureInfo = CultureInfo.CurrentCulture;
 
     private async Task Register()
@@ -63,13 +63,18 @@
         var cultureName = _cultureInfo.Name;
 
         clientFactory.DefaultRequestHeaders.AcceptLanguage.Clear();
-        clientFactory.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(cultureName));
+        clientFactory.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(cultureName));        
 
         try
         {
             await _form.Validate();
 
-            var response = await clientFactory.PostAsJsonAsync<RequestRegisterUserJson>($"{clientFactory.BaseAddress}/users", Expense);            
+            if (!_form.IsValid)
+            {
+                return;
+            }
+
+            var response = await clientFactory.PostAsJsonAsync<RequestRegisterUserJson>($"{clientFactory.BaseAddress}/users", User);            
 
             if (response.IsSuccessStatusCode)
             {
@@ -103,8 +108,8 @@
 
     private void ClearForm()
     {
-        Expense.Name = string.Empty;
-        Expense.Email = string.Empty;
-        Expense.Password = string.Empty;
+        User.Name = string.Empty;
+        User.Email = string.Empty;
+        User.Password = string.Empty;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CashFlow.Application.UseCases.Expenses.GetById;
 using CashFlow.Communication.Responses.Errors;
 using CashFlow.Communication.Responses.Expenses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers.Expenses;
@@ -18,6 +19,7 @@ public class GetExpenseByIdController : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
+    [Authorize]
     [ProducesResponseType(typeof(ResponseExpenseJson), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ResponseExpenseJson>> GetById([FromRoute] int id)

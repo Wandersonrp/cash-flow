@@ -8,6 +8,7 @@ using CashFlow.Application.UseCases.Expenses.SumTotal;
 using CashFlow.Application.UseCases.Expenses.Update;
 using CashFlow.Application.UseCases.Reports.Expenses.Excel;
 using CashFlow.Application.UseCases.Reports.Expenses.Pdf;
+using CashFlow.Application.UseCases.Users.DoLogin;
 using CashFlow.Application.UseCases.Users.Register;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -37,6 +38,7 @@ public static class DependencyInjectionExtension
             .AddScoped<IGenerateExpensesReportPdf, GenerateExpensesReportPdfUseCase>()
             .AddScoped<ICountExpenses, CountExpensesUseCase>()
             .AddScoped<IExpenseSumTotal, ExpenseSumTotalUseCase>()
-            .AddScoped<IRegisterUser, RegisterUserUseCase>();
+            .AddScoped<IRegisterUser, RegisterUserUseCase>()
+            .AddScoped<IDoLogin, DoLoginUseCase>();
     }
 }

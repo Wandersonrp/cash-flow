@@ -1,4 +1,5 @@
 ﻿using CashFlow.Application.UseCases.Expenses.SumTotal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers.Expenses;
@@ -15,6 +16,7 @@ public class ExpenseSumTotalController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
     public async Task<ActionResult<decimal>> SumAsync()
     {

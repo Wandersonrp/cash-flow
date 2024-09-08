@@ -1,9 +1,129 @@
 ﻿@page "/login"
 
+@using System.Globalization
+@using CashFlow.Communication.Requests.Users
+@using CashFlow.Communication.Responses.Users
+@using CashFlow.Web.Shared.Validators
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using System.Net
+
+@inject NavigationManager NavigationManager
+@inject ProtectedLocalStorage ProtectedLocalStorage
+@inject IConfiguration Configuration
+@inject ISnackbar Snackbar
+
 <PageTitle>Login</PageTitle>
 
-<h3>Login</h3>
+<main class="d-flex align-center justify-center" style="width: 100vw; height: 100vh;">
+    <MudCard Class="pa-5" Style="min-height: 350px; min-width: 400px;">
+        <MudCardHeader Class="d-flex pa-2 justify-center">
+            <MudText Typo="Typo.h5" Class="mb-0">Entrar</MudText>
+        </MudCardHeader>
+        <MudForm Class="d-flex flex-column gap-5" Model="@User" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent Class="d-flex flex-column gap-3 px-3">                
+                <MudTextField @bind-Value="User.Email"
+                              For="@(() => User.Email)"
+                              InputType="InputType.Email"
+                              Immediate="true"
+                              Label="E-mail" />
+
+                <MudTextField @bind-Value="User.Password"
+                              For="@(() => User.Password)"
+                              InputType="InputType.Password"
+                              Immediate="true"
+                              Label="Senha" />
+
+                @if (!string.IsNullOrWhiteSpace(_invalidCredentialError))
+                {
+                    <MudText Typo="Typo.subtitle2" Color="Color.Error">@_invalidCredentialError</MudText>
+                }
+            </MudCardContent>
+            <div class="d-flex flex-column px-2 gap-3 justify-center" style="width: 100%;">
+                <MudButton Disabled="@(_isLoading ? true : false)" Class="pa-2" OnClick="@(async () => await DoLogin())" Variant="Variant.Filled" Color="Color.Primary">
+                    @if(_isLoading)
+                    {
+                        <MudProgressCircular Color="Color.Default" Indeterminate="true" Size="Size.Small" />
+                    }
+                    else
+                    {
+                        <span>Entrar</span>
+                    }
+                </MudButton>
+                <MudLink Typo="Typo.subtitle1" Class="d-flex justify-center" Href="/cadastrar">Não possui uma conta? Cadastre-se</MudLink>
+            </div>
+        </MudForm>
+    </MudCard>
+</main>
 
 @code {
 
+    private MudForm _form = new();
+    private CultureInfo _cultureInfo = CultureInfo.CurrentCulture;
+    private RequestLoginUserJson User = new();
+    private LoginUserValidator _validator = new();    
+    private string? _invalidCredentialError { get; set; } = null;
+    private bool _isLoading { get; set; }
+
+    private async Task DoLogin()
+    {
+        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+
+        _isLoading = true;
+
+        try
+        {
+            await _form.Validate();
+
+            if (!_form.IsValid)
+            {
+                _isLoading = false;
+                return;
+            }
+
+            var response = await clientFactory.PostAsJsonAsync<RequestLoginUserJson>($"{clientFactory.BaseAddress}/login", User);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<ResponseLoginUserJson>();
+
+                if(content is not null)
+                {
+                    var userName = content.Name;
+                    var token = content.Token;
+
+                    await ProtectedLocalStorage.SetAsync("asp_token", token);
+                    await ProtectedLocalStorage.SetAsync("asp_name", userName);
+
+                    NavigationManager.NavigateTo("/dashboard");
+
+                    _isLoading = false;
+                }
+            }
+            else if(response.StatusCode == HttpStatusCode.Unauthorized)
+            {                
+                _invalidCredentialError = "Credenciais inválidas";
+
+                StateHasChanged();
+
+                _isLoading = false;
+
+                ClearForm();
+
+                await Task.Delay(500);
+
+                _invalidCredentialError = null;
+            }
+        }
+        catch(Exception)
+        {
+            Snackbar.Add("Ocorreu um erro ao fazer login", Severity.Error);
+            _isLoading = false;
+        }
+    }
+
+    private void ClearForm()
+    {        
+        User.Email = string.Empty;
+        User.Password = string.Empty;
+    }
 }

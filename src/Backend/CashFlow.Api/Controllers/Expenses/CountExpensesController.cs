@@ -1,4 +1,5 @@
 ﻿using CashFlow.Application.UseCases.Expenses.Count;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers.Expenses;
@@ -15,6 +16,7 @@ public class CountExpensesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> CountExpenses()
     {

@@ -132,6 +132,9 @@
   <data name="EXPENSE_NOT_FOUND" xml:space="preserve">
     <value>Expense not found</value>
   </data>
+  <data name="INVALID_CREDENTIALS" xml:space="preserve">
+    <value>Invalid credentials </value>
+  </data>
   <data name="INVALID_EMAIL" xml:space="preserve">
     <value>Email is invalid</value>
   </data>

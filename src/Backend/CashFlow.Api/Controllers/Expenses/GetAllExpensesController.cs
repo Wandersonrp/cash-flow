@@ -1,6 +1,7 @@
 ﻿using CashFlow.Application.UseCases.Expenses.GetAll;
 using CashFlow.Communication.Requests.Pagination;
 using CashFlow.Communication.Responses.Expenses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers.Expenses;
@@ -17,6 +18,7 @@ public class GetAllExpensesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(typeof(ResponseGetAllExpensesJson), StatusCodes.Status200OK)]
     public async Task<ActionResult<ResponseGetAllExpensesJson>> GetAll(
         [FromQuery] int? page, 

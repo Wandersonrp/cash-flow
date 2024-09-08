@@ -28,4 +28,14 @@ internal class UserRepository : IUserRepository
 
         return exists;
     }
+
+    public async Task<User?> GetByEmail(string email)
+    {
+        var user = await _context
+            .Users
+            .AsNoTracking()            
+            .FirstOrDefaultAsync(x => x.Email.Equals(email));
+
+        return user;
+    }
 }

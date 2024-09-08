@@ -2,10 +2,12 @@
 using CashFlow.Domain.Repositories.UnitOfWork;
 using CashFlow.Domain.Repositories.Users;
 using CashFlow.Domain.Security.Cryptography;
+using CashFlow.Domain.Security.Tokens;
 using CashFlow.Infrastructure.Data.Context;
 using CashFlow.Infrastructure.Data.Repositories;
 using CashFlow.Infrastructure.Data.UnitOfWork;
 using CashFlow.Infrastructure.Security.Cryptography;
+using CashFlow.Infrastructure.Security.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,8 +20,7 @@ public static class DependencyInjectionExtension
         AddDbContext(services, configuration);
         AddRepositories(services);
         AddUnitOfWork(services);
-
-        services.AddScoped<IPasswordEncrypter, Encrypter>();
+        AddSecurity(services, configuration);        
     }
 
     private static void AddRepositories(IServiceCollection services)
@@ -44,5 +45,18 @@ public static class DependencyInjectionExtension
     {
         services
             .AddScoped<IUnitOfWork, UnitOfWork>();
+    }
+
+    private static void AddSecurity(IServiceCollection services, IConfiguration configuration)
+    {
+        var signingKey = configuration["AppSettings:Jwt:SigningKey"] ??
+            throw new InvalidOperationException("Provide a JWT signing key");
+
+        var expirationTimeMinutes = uint.Parse(configuration["AppSettings:Jwt:ExpirationTimeMinutes"] ??
+            throw new InvalidOperationException("Provide a JWT expiration time in minutes"));
+
+        services.AddScoped<IAccessTokenGenerator>(provider => new JwtTokenGenerator(signingKey, expirationTimeMinutes));
+        services.AddScoped<IPasswordEncrypter, Encrypter>();
+        services.AddScoped<IPasswordComparer, Encrypter>();
     }
 }
