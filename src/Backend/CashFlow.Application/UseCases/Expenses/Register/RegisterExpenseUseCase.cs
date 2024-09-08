@@ -28,7 +28,7 @@ public class RegisterExpenseUseCase : IRegisterExpense
     {
         Validate(request);
 
-        var expense = _mapper.Map<Expense>(request);
+        var expense = _mapper.Map<Expense>(request);        
 
         var createdExpense = await _expenseRepository.AddAsync(expense);
 

@@ -6,4 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.9.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CashFlow.Exception\CashFlow.Exception.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Responses\Users\" />
+  </ItemGroup>
+
 </Project>

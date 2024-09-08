@@ -1,0 +1,110 @@
+﻿@page "/cadastrar"
+
+@layout InitialLayout
+
+@using CashFlow.Communication.Requests.Users
+@using CashFlow.Communication.Responses.Errors
+@using CashFlow.Web.Shared.Validators
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using System.Net
+@using System.Globalization
+@using System.Net.Http.Headers
+
+@inject IConfiguration Configuration
+@inject ProtectedLocalStorage ProtectedLocalStorage
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Cadastrar</PageTitle>
+
+<main class="d-flex align-center justify-center" style="width: 100vw; height: 100vh;">
+    <MudCard Class="pa-5" Style="min-height: 350px; min-width: 400px;">
+        <MudCardHeader Class="d-flex pa-2 justify-center">
+            <MudText Typo="Typo.h5" Class="mb-0">Cadastre-se</MudText>
+        </MudCardHeader>
+        <MudForm Class="d-flex flex-column gap-5" Model="@Expense" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent Class="d-flex flex-column gap-3 px-3">
+                <MudTextField @bind-Value="Expense.Name" 
+                              For="@(() => Expense.Name)" 
+                              Immediate="true" 
+                              Label="Nome completo" />
+
+                <MudTextField @bind-Value="Expense.Email"
+                              For="@(() => Expense.Email)"
+                              InputType="InputType.Email"
+                              Immediate="true"
+                              Label="E-mail" />
+
+                <MudTextField @bind-Value="Expense.Password"
+                              For="@(() => Expense.Password)"
+                              InputType="InputType.Password"
+                              Immediate="true"
+                              Label="Senha" />        
+            </MudCardContent>
+            <div class="d-flex flex-column px-2 gap-3 justify-center" style="width: 100%;">
+                <MudButton Class="pa-2" OnClick="@(async () => await Register())" Variant="Variant.Filled" Color="Color.Primary">Cadastrar</MudButton>
+                <MudLink Typo="Typo.subtitle1" Class="d-flex justify-center" Href="/login">Login</MudLink>
+            </div>
+        </MudForm>
+    </MudCard>
+</main>
+
+@code {
+
+    private MudForm _form = new();
+    private RegisterUserFluentValidator _validator = new();
+    private RequestRegisterUserJson Expense { get; set; } = new();
+    private CultureInfo _cultureInfo = CultureInfo.CurrentCulture;
+
+    private async Task Register()
+    {
+        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+
+        var cultureName = _cultureInfo.Name;
+
+        clientFactory.DefaultRequestHeaders.AcceptLanguage.Clear();
+        clientFactory.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(cultureName));
+
+        try
+        {
+            await _form.Validate();
+
+            var response = await clientFactory.PostAsJsonAsync<RequestRegisterUserJson>($"{clientFactory.BaseAddress}/users", Expense);            
+
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            else if(response.StatusCode == HttpStatusCode.Conflict)
+            {
+                Snackbar.Add("E-mail já cadastrado", Severity.Error);
+                ClearForm();
+            }
+            else if(response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var content = await response.Content.ReadFromJsonAsync<ResponseErrorJson>();
+
+                if(content is not null)
+                {
+                    var errorMessages = content.ErrorMessages;
+
+                    foreach(var errorMessage in errorMessages)
+                    {
+                        Snackbar.Add(errorMessage, Severity.Error);
+                    }
+                }                
+            }
+        } 
+        catch(Exception ex)
+        {
+           Console.WriteLine(ex.Message);                
+        }
+    }
+
+    private void ClearForm()
+    {
+        Expense.Name = string.Empty;
+        Expense.Email = string.Empty;
+        Expense.Password = string.Empty;
+    }
+}

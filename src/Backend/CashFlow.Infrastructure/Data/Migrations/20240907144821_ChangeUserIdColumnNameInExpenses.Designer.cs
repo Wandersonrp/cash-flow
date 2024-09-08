@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CashFlow.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(CashFlowDbContext))]
-    [Migration("20240824164906_Initial")]
-    partial class Initial
+    [Migration("20240907144821_ChangeUserIdColumnNameInExpenses")]
+    partial class ChangeUserIdColumnNameInExpenses
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,9 +57,64 @@ namespace CashFlow.Infrastructure.Data.Migrations
                         .HasColumnType("varchar(20)")
                         .HasColumnName("title");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Expenses");
+                });
+
+            modelBuilder.Entity("CashFlow.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("password");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("role");
+
+                    b.Property<Guid>("UserIdentifier")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_identifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("CashFlow.Domain.Entities.Expense", b =>
+                {
+                    b.HasOne("CashFlow.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

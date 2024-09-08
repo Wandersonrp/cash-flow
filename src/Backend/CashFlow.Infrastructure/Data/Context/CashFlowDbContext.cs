@@ -4,14 +4,14 @@ using CashFlow.Infrastructure.Data.EntityConfiguration;
 using Microsoft.EntityFrameworkCore;
 
 namespace CashFlow.Infrastructure.Data.Context;
-
-public class CashFlowDbContext : DbContext
+internal class CashFlowDbContext : DbContext
 {
     public CashFlowDbContext(DbContextOptions<CashFlowDbContext> options) : base(options)
     {        
     }
 
     public DbSet<Expense> Expenses { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,6 +19,7 @@ public class CashFlowDbContext : DbContext
         
         modelBuilder.HasPostgresEnum<PaymentType>();
 
-        modelBuilder.ApplyConfiguration(new ExpenseEntityTypeConfiguration()); 
+        modelBuilder.ApplyConfiguration(new ExpenseEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new UserEntityTypeConfiguration());
     }
 }

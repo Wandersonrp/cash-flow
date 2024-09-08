@@ -1,12 +1,10 @@
+using CashFlow.Api.Converter;
 using CashFlow.Api.Filters;
 using CashFlow.Api.Middlewares;
-using CashFlow.Infrastructure;
 using CashFlow.Application;
-using CashFlow.Api.Converter;
+using CashFlow.Infrastructure;
+using CashFlow.Infrastructure.Data.Migrations;
 using Microsoft.OpenApi.Models;
-using System.Runtime.CompilerServices;
-using CashFlow.Infrastructure.Data.Context;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +41,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 builder.Services.AddLocalization();
 
 var app = builder.Build();
@@ -55,13 +52,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-InitializeDbContext.Initialize(app);
-
 app.UseMiddleware<CultureMiddleware>();
 
 app.UseRequestLocalization(new RequestLocalizationOptions()
-    .AddSupportedCultures(new[] { "en", "pt-BR", "pt-PT" })
-    .AddSupportedUICultures(new[] { "en", "pt-BR", "pt-PT" })
+    .AddSupportedCultures(new[] { "en", "pt-BR", "pt-PT", "fr" })
+    .AddSupportedUICultures(new[] { "en", "pt-BR", "pt-PT", "fr" })
 );
 
 app.UseHttpsRedirection();
@@ -70,15 +65,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+await MigrateDatabase();
+
 app.Run();
 
-internal static class InitializeDbContext
-{    
-    internal static void Initialize(WebApplication app)
-    {
-        using var scope = app.Services.CreateScope();
-        var services = scope.ServiceProvider;
-        var context = services.GetRequiredService<CashFlowDbContext>();
-        context.Expenses.Count();
-    }
+async Task MigrateDatabase()
+{
+    await using var scope = app.Services.CreateAsyncScope();
+
+    await DatabaseMigration.MigrateDatabase(scope.ServiceProvider);
 }

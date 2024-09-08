@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CashFlow.Infrastructure.Data.EntityConfiguration;
-
 internal class ExpenseEntityTypeConfiguration : IEntityTypeConfiguration<Expense>
 {
     public void Configure(EntityTypeBuilder<Expense> builder)
@@ -41,6 +40,17 @@ internal class ExpenseEntityTypeConfiguration : IEntityTypeConfiguration<Expense
             .Property(e => e.PaymentType)
             .HasColumnName("payment_type")
             .HasConversion<string>()
+            .IsRequired();
+
+        builder
+            .HasOne(e => e.User)
+            .WithMany()
+            .HasForeignKey(e => e.UserId);
+
+        builder
+            .Property(e => e.UserId)
+            .HasColumnName("user_id")
+            .HasColumnType("int")
             .IsRequired();
     }
 }

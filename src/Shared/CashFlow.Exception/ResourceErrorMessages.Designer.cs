@@ -70,6 +70,24 @@ namespace CashFlow.Exception {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Email already exists.
+        /// </summary>
+        public static string EMAIL_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("EMAIL_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Email can not be empty.
+        /// </summary>
+        public static string EMPTY_EMAIL {
+            get {
+                return ResourceManager.GetString("EMPTY_EMAIL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Expense not found.
         /// </summary>
         public static string EXPENSE_NOT_FOUND {
@@ -88,11 +106,38 @@ namespace CashFlow.Exception {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Email is invalid.
+        /// </summary>
+        public static string INVALID_EMAIL {
+            get {
+                return ResourceManager.GetString("INVALID_EMAIL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Password must have at least 8 characters, one upper letter, one lower letter, one number and one special character (e.g. !, ?, *, .).
+        /// </summary>
+        public static string INVALID_PASSWORD {
+            get {
+                return ResourceManager.GetString("INVALID_PASSWORD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Items per page filter must be greater than 0.
         /// </summary>
         public static string ITEMS_PER_PAGE_MUST_BE_GREATER_THAN_ZERO {
             get {
                 return ResourceManager.GetString("ITEMS_PER_PAGE_MUST_BE_GREATER_THAN_ZERO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Name can not be empty.
+        /// </summary>
+        public static string NAME_EMPTY {
+            get {
+                return ResourceManager.GetString("NAME_EMPTY", resourceCulture);
             }
         }
         
