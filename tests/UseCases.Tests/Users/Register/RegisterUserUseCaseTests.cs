@@ -53,7 +53,7 @@ public class RegisterUserUseCaseTests
         var mapper = MapperBuilder.Build();
         var unitOfWork = UnitOfWorkBuilder.Build();
         var userRepository = new UserRepositoryBuilder();
-        var passwordEncrypter = PasswordEcrypterBuilder.Build();
+        var passwordEncrypter = new PasswordEcrypterBuilder().BuildEncrypter();
 
         if (!string.IsNullOrWhiteSpace(email))
         {

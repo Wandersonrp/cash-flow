@@ -4,12 +4,32 @@ using Moq;
 namespace Commom.Test.Utilities.Cryptography;
 public class PasswordEcrypterBuilder
 {
-    public static IPasswordEncrypter Build()
+    private readonly Mock<IPasswordEncrypter> _encrypter;
+    private readonly Mock<IPasswordComparer> _comparer;
+
+    public PasswordEcrypterBuilder()
     {
-        var mock = new Mock<IPasswordEncrypter>();
+        _comparer = new Mock<IPasswordComparer>();
 
-        mock.Setup(passwordEncrypter => passwordEncrypter.Encrypt(It.IsAny<string>())).Returns("hashed_password");
+        _encrypter = new Mock<IPasswordEncrypter>();
 
-        return mock.Object;
+        _encrypter.Setup(passwordEncrypter => passwordEncrypter.Encrypt(It.IsAny<string>())).Returns("hashed_password");
+    }    
+
+    public PasswordEcrypterBuilder Comparer(string password)
+    {
+        _comparer.Setup(comparer => comparer.Comparer(password, It.IsAny<string>())).Returns(true);
+
+        return this;
+    }
+
+    public IPasswordComparer BuildComparer()
+    {
+        return _comparer.Object;
+    }
+
+    public IPasswordEncrypter BuildEncrypter()
+    {
+        return _encrypter.Object;
     }
 }

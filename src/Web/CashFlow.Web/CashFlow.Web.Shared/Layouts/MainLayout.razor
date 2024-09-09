@@ -1,12 +1,22 @@
-﻿@using MudBlazor
+﻿@using Blazored.LocalStorage
+@using CashFlow.Communication.Responses.Users
+@using MudBlazor
 
 @inherits LayoutComponentBase
+
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
+
+@if(_user is null)
+{
+    <h1>É nulo</h1>
+}
 
 <MudLayout>
     <MudAppBar Elevation="1" Dense="true">
@@ -31,10 +41,18 @@
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
+    private ResponseUserJson? _user;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
+
+        var accessToken = await LocalStorage.GetItemAsync<string>("asp_token");
+
+        if (accessToken is null)
+        {
+            NavigationManager.NavigateTo("/login");
+        }        
 
         _theme = new()
         {

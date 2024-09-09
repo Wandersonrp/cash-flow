@@ -13,7 +13,6 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-
 var cashFlowApiBaseUrl = builder.Configuration.GetValue<string>("AppSettings:CashFlowApiUrl") ?? throw new InvalidOperationException("Provide a base api url");
 
 builder.Services.AddHttpClient("CashFlow.Api", client =>
