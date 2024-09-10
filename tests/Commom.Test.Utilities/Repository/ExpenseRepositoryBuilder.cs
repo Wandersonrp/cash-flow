@@ -19,6 +19,13 @@ public class ExpenseRepositoryBuilder
         return this;
     }    
 
+    public ExpenseRepositoryBuilder GetByIdAsync(Expense expense)
+    {
+        _repository.Setup(repository => repository.GetByIdAsync(expense.Id)).ReturnsAsync(expense);
+
+        return this;
+    }
+
     public IExpenseRepository Build()
     {
         return _repository.Object;
