@@ -4,7 +4,7 @@ using CashFlow.Infrastructure.Data.EntityConfiguration;
 using Microsoft.EntityFrameworkCore;
 
 namespace CashFlow.Infrastructure.Data.Context;
-internal class CashFlowDbContext : DbContext
+public class CashFlowDbContext : DbContext
 {
     public CashFlowDbContext(DbContextOptions<CashFlowDbContext> options) : base(options)
     {        

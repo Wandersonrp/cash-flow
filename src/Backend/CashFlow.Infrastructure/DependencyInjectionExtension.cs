@@ -6,6 +6,7 @@ using CashFlow.Domain.Security.Tokens;
 using CashFlow.Infrastructure.Data.Context;
 using CashFlow.Infrastructure.Data.Repositories;
 using CashFlow.Infrastructure.Data.UnitOfWork;
+using CashFlow.Infrastructure.Extensions;
 using CashFlow.Infrastructure.Security.Cryptography;
 using CashFlow.Infrastructure.Security.Tokens;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +18,14 @@ public static class DependencyInjectionExtension
 {
     public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        AddDbContext(services, configuration);
         AddRepositories(services);
         AddUnitOfWork(services);
-        AddSecurity(services, configuration);        
+        AddSecurity(services, configuration); 
+        
+        if(!configuration.IsTestEnvironment())
+        {
+            AddDbContext(services, configuration);
+        }
     }
 
     private static void AddRepositories(IServiceCollection services)

@@ -35,7 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CashFlow.Web.Client", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CashFlow.Web.Shared", "src\Web\CashFlow.Web\CashFlow.Web.Shared\CashFlow.Web.Shared.csproj", "{1860BA3A-A4A4-492A-9934-61F1EC20EA38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UseCases.Tests", "tests\UseCases.Tests\UseCases.Tests.csproj", "{7D0B31C9-FF45-4ABA-B832-4E433750E20D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UseCases.Tests", "tests\UseCases.Tests\UseCases.Tests.csproj", "{7D0B31C9-FF45-4ABA-B832-4E433750E20D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.Tests", "tests\WebApi.Tests\WebApi.Tests.csproj", "{2E6C160A-65C4-4EAD-B1F5-8DE9C23BBB00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +93,10 @@ Global
 		{7D0B31C9-FF45-4ABA-B832-4E433750E20D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D0B31C9-FF45-4ABA-B832-4E433750E20D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D0B31C9-FF45-4ABA-B832-4E433750E20D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E6C160A-65C4-4EAD-B1F5-8DE9C23BBB00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E6C160A-65C4-4EAD-B1F5-8DE9C23BBB00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E6C160A-65C4-4EAD-B1F5-8DE9C23BBB00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E6C160A-65C4-4EAD-B1F5-8DE9C23BBB00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -111,6 +117,7 @@ Global
 		{9025A563-2DAB-4804-87DB-082B257203E8} = {BF31CE37-D28B-4713-9208-F2C2B2620EA0}
 		{1860BA3A-A4A4-492A-9934-61F1EC20EA38} = {BF31CE37-D28B-4713-9208-F2C2B2620EA0}
 		{7D0B31C9-FF45-4ABA-B832-4E433750E20D} = {A72FE93D-59BB-4CDB-B869-751BE2E19CEF}
+		{2E6C160A-65C4-4EAD-B1F5-8DE9C23BBB00} = {A72FE93D-59BB-4CDB-B869-751BE2E19CEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {938536DA-76CE-43F8-A8CE-9295720E8585}
