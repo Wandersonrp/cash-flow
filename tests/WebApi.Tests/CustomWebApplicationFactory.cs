@@ -1,4 +1,6 @@
-﻿using CashFlow.Infrastructure.Data.Context;
+﻿using CashFlow.Domain.Entities;
+using CashFlow.Infrastructure.Data.Context;
+using Commom.Test.Utilities.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     options.UseInMemoryDatabase("InMemoryDbForTesting");
                     options.UseInternalServiceProvider(provider);
                 });
+
+                var scope = services.BuildServiceProvider().CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<CashFlowDbContext>();
             });
     }
 }

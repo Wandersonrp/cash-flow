@@ -3,15 +3,18 @@ using CashFlow.Domain.Repositories.UnitOfWork;
 using CashFlow.Domain.Repositories.Users;
 using CashFlow.Domain.Security.Cryptography;
 using CashFlow.Domain.Security.Tokens;
+using CashFlow.Domain.Services.LoggedUser;
 using CashFlow.Infrastructure.Data.Context;
 using CashFlow.Infrastructure.Data.Repositories;
 using CashFlow.Infrastructure.Data.UnitOfWork;
 using CashFlow.Infrastructure.Extensions;
 using CashFlow.Infrastructure.Security.Cryptography;
 using CashFlow.Infrastructure.Security.Tokens;
+using CashFlow.Infrastructure.Services.LoggedUser;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace CashFlow.Infrastructure;
 public static class DependencyInjectionExtension
@@ -20,9 +23,10 @@ public static class DependencyInjectionExtension
     {
         AddRepositories(services);
         AddUnitOfWork(services);
-        AddSecurity(services, configuration); 
-        
-        if(!configuration.IsTestEnvironment())
+        AddSecurity(services, configuration);
+        AddServices(services);
+
+        if (!configuration.IsTestEnvironment())
         {
             AddDbContext(services, configuration);
         }
@@ -63,5 +67,10 @@ public static class DependencyInjectionExtension
         services.AddScoped<IAccessTokenGenerator>(provider => new JwtTokenGenerator(signingKey, expirationTimeMinutes));
         services.AddScoped<IPasswordEncrypter, Encrypter>();
         services.AddScoped<IPasswordComparer, Encrypter>();
+    }
+
+    private static void AddServices(IServiceCollection services)
+    {
+        services.AddScoped<ILoggedUser, LoggedUser>();
     }
 }

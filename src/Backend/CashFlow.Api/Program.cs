@@ -1,7 +1,9 @@
 using CashFlow.Api.Converter;
 using CashFlow.Api.Filters;
 using CashFlow.Api.Middlewares;
+using CashFlow.Api.Token;
 using CashFlow.Application;
+using CashFlow.Domain.Security.Tokens;
 using CashFlow.Infrastructure;
 using CashFlow.Infrastructure.Data.Migrations;
 using CashFlow.Infrastructure.Extensions;
@@ -15,6 +17,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddApplication();
+
+builder.Services.AddScoped<ITokenProvider, HttpContextTokenValue>();
+
+builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options =>
