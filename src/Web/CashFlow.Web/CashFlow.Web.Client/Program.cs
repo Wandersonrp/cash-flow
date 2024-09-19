@@ -1,4 +1,5 @@
-using Blazored.LocalStorage;
+using CashFlow.Web.Client.Services.Token;
+using CashFlow.Web.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 
@@ -10,6 +11,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(cashFlow
 
 builder.Services.AddMudServices();
 
-builder.Services.AddBlazoredLocalStorageAsSingleton();
+builder.Services.AddRazorShared();
 
 await builder.Build().RunAsync();

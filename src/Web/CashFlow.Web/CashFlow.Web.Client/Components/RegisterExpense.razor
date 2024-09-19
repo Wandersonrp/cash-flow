@@ -1,11 +1,15 @@
 ﻿@using CashFlow.Communication.Enums.Expenses
 @using CashFlow.Communication.Requests.Expenses
+@using CashFlow.Web.Client.Services.Token
 @using CashFlow.Web.Client.StringConverters
 @using CashFlow.Web.Shared.Validators
 @using System.Globalization
+@using System.Net.Http.Headers
 
 @inject ISnackbar Snackbar
 @inject IConfiguration Configuration
+@inject CashFlowApiClientFactory ClientFactory
+@inject ITokenProvider TokenProvider
 
 <MudDialog Style="min-width: 500px; padding: 1rem;">
     <TitleContent>
@@ -79,7 +83,11 @@
 
     private async Task RegisterExpenseAsync()
     {
-        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+        using var clientFactory = await ClientFactory.CreateClient(Configuration);
+
+        var token = await TokenProvider.Get();
+
+        clientFactory.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         Expense.Date = _date.Value;               
 

@@ -1,7 +1,9 @@
 using CashFlow.Web.Components;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.JSInterop;
 using MudBlazor.Services;
+using CashFlow.Web.Shared;
+using CashFlow.Web.Client.Services.Token;
+using CashFlow.Web.Client;
+using CashFlow.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,14 @@ builder.Services.AddHttpClient("CashFlow.Api", client =>
 });
 
 builder.Services.AddLocalization();
+
+builder.Services.AddRazorShared();
+
+builder.Services.AddScoped<ITokenProvider, TokenProvider>();
+
+builder.Services.AddScoped<CashFlowApiClientFactory>();
+
+builder.Services.AddScoped<LocalStorageAccessor>();
 
 var app = builder.Build();
 

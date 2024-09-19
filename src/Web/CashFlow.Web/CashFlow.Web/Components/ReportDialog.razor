@@ -1,3 +1,4 @@
+@using Blazored.LocalStorage
 @using CashFlow.Web.Client.Enums
 @using CashFlow.Web.Client.StringConverters
 @using System.Net.Http.Headers
@@ -8,6 +9,8 @@
 @inject IConfiguration Configuration
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
+@inject CashFlowApiClientFactory ClientFactory
+@inject ILocalStorageService LocalStorage
 
 @rendermode InteractiveServer
 
@@ -41,10 +44,14 @@
 
     private async Task GenerateReport()
     {
-        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
-
+        using var clientFactory = await ClientFactory.CreateClient(Configuration);
+        
         try 
         {
+            var token = await LocalStorage.GetItemAsync<string>("token");
+
+            clientFactory.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             var cultureName = _cultureInfo.Name;            
 
             clientFactory.DefaultRequestHeaders.AcceptLanguage.Clear();

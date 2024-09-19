@@ -2,8 +2,14 @@
 
 @inject HttpClient HttpClient
 @inject IConfiguration Configuraiton
+@inject ITokenProvider TokenProvider
+@inject CashFlowApiClientFactory ClientFactory
+@inject ITokenProvider TokenProvider
 
 @using System.Globalization
+@using CashFlow.Web.Client.Services.Token
+@using System.Net.Http.Headers
+
 
 @layout MainLayout
 
@@ -68,10 +74,10 @@
 
 @code {
     private int _totalExpenses { get; set; }
-    private decimal _sumExpenses { get; set; }
+    private decimal _sumExpenses { get; set; }    
 
     protected override async Task OnInitializedAsync()
-    {
+    {        
         await LoadData();
     }
 
@@ -88,14 +94,22 @@
 
     private async Task SumExpenses()
     {
-        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuraiton);
+        using var clientFactory = await ClientFactory.CreateClient(Configuraiton);
+
+        var token = await TokenProvider.Get();
+
+        clientFactory.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         _sumExpenses = await clientFactory.GetFromJsonAsync<decimal>($"{clientFactory.BaseAddress}/expenses/sum");  
     }
 
     private async Task GetTotalExpenses()
     {
-        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuraiton);
+        using var clientFactory = await  ClientFactory.CreateClient(Configuraiton);
+
+        var token = await TokenProvider.Get();        
+
+        clientFactory.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         _totalExpenses = await clientFactory.GetFromJsonAsync<int>($"{clientFactory.BaseAddress}/expenses/count");
     }

@@ -74,13 +74,20 @@ internal class ExpenseRepository : IExpenseRepository
             .ToListAsync();
     }
 
-    public async Task<(List<Expense> expenses, int count)> GetAllAsync(int page, int itemsPerPage)
-    {      
-        var count = await _context.Expenses.CountAsync();
+    public async Task<(List<Expense> expenses, int count)> GetAllAsync(int page, int itemsPerPage, int userId)
+    {              
 
-        var expenses = await _context
+        var query = _context
             .Expenses
             .AsNoTracking()
+            .Where(x => x.UserId == userId);
+
+
+        var count = await query.CountAsync();
+
+        var expenses = await query            
+            .AsNoTracking()
+            .Where(x => x.UserId == userId)
             .OrderByDescending(x => x.Date)
             .Skip((page - 1) * itemsPerPage)
             .Take(itemsPerPage)           

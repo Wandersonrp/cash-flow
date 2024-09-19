@@ -4,6 +4,7 @@ using CashFlow.Communication.Responses.Expenses;
 using CashFlow.Communication.Responses.Pagination;
 using CashFlow.Domain.Entities;
 using CashFlow.Domain.Repositories.Expenses;
+using CashFlow.Domain.Services.LoggedUser;
 using CashFlow.Exception.ExceptionsBase;
 
 namespace CashFlow.Application.UseCases.Expenses.GetAll;
@@ -11,21 +12,24 @@ public class GetAllExpensesUseCase : IGetAllExpenses
 {
     private readonly IExpenseRepository _expenseRepository;
     private readonly IMapper _mapper;
+    private readonly ILoggedUser _loggedUser;
 
-    public GetAllExpensesUseCase(IExpenseRepository expenseRepository, IMapper mapper)
+    public GetAllExpensesUseCase(IExpenseRepository expenseRepository, IMapper mapper, ILoggedUser loggedUser)
     {
         _expenseRepository = expenseRepository;
         _mapper = mapper;
+        _loggedUser = loggedUser;
     }
 
     public async Task<ResponseGetAllExpensesJson> Execute(RequestPaginationJson pagination)
     {
         Validate(pagination);
 
-        (List<Expense> expenses, int count) tuple = await _expenseRepository
-            .GetAllAsync(pagination.Page, pagination.ItemsPerPage);
-        
+        var user = await _loggedUser.Get();
 
+        (List<Expense> expenses, int count) tuple = await _expenseRepository
+            .GetAllAsync(pagination.Page, pagination.ItemsPerPage, user.Id);
+        
         return new ResponseGetAllExpensesJson
         {
             Expenses = tuple.expenses.Select(expense => _mapper.Map<ResponseExpenseJson>(expense)).ToList(),

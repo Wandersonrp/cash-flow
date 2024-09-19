@@ -14,6 +14,7 @@
 @inject ProtectedLocalStorage ProtectedLocalStorage
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
+@inject CashFlowApiClientFactory ClientFactory
 
 <PageTitle>Cadastrar</PageTitle>
 
@@ -58,7 +59,7 @@
 
     private async Task Register()
     {
-        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+        using var clientFactory = await ClientFactory.CreateClient(Configuration);
 
         var cultureName = _cultureInfo.Name;
 

@@ -1,12 +1,16 @@
 ﻿@page "/despesas"
 
 @inject IDialogService DialogService
+@inject CashFlowApiClientFactory ClientFactory
+@inject ITokenProvider TokenProvider
 
 @using CashFlow.Communication.Enums.Expenses
 @using CashFlow.Communication.Requests.Expenses
 @using CashFlow.Communication.Responses.Expenses
 @using CashFlow.Communication.Responses.Pagination
 @using System.Text.Json
+@using System.Net.Http.Headers
+@using CashFlow.Web.Client.Services.Token
 
 @inject IConfiguration Configuration
 
@@ -57,7 +61,11 @@
 
     private async Task GetAllExpenses()
     {
-        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+        using var clientFactory = await ClientFactory.CreateClient(Configuration);
+
+        var token = await TokenProvider.Get();
+
+        clientFactory.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         var response = await clientFactory.GetFromJsonAsync<ResponseGetAllExpensesJson>($"{clientFactory.BaseAddress}/expenses?page={_page}&itemsPerPage={_itemsPerPage}");      
 

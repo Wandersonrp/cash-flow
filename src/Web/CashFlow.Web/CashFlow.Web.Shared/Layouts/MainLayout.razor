@@ -1,5 +1,4 @@
-﻿@using Blazored.LocalStorage
-@using CashFlow.Communication.Responses.Users
+﻿@using CashFlow.Communication.Responses.Users
 @using MudBlazor
 
 @inherits LayoutComponentBase
@@ -12,11 +11,6 @@
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
-
-@if(_user is null)
-{
-    <h1>É nulo</h1>
-}
 
 <MudLayout>
     <MudAppBar Elevation="1" Dense="true">

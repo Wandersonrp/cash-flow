@@ -1,16 +1,17 @@
 ﻿@page "/login"
 
 @using System.Globalization
+@using Blazored.LocalStorage
 @using CashFlow.Communication.Requests.Users
 @using CashFlow.Communication.Responses.Users
 @using CashFlow.Web.Shared.Validators
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using System.Net
 
 @inject NavigationManager NavigationManager
-@inject ProtectedLocalStorage ProtectedLocalStorage
+@inject ILocalStorageService LocalStorage
 @inject IConfiguration Configuration
 @inject ISnackbar Snackbar
+@inject CashFlowApiClientFactory ClientFactory
 
 <PageTitle>Login</PageTitle>
 
@@ -66,7 +67,7 @@
 
     private async Task DoLogin()
     {
-        var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+        using var clientFactory = await ClientFactory.CreateClient(Configuration);
 
         _isLoading = true;
 
@@ -91,8 +92,8 @@
                     var userName = content.Name;
                     var token = content.Token;
 
-                    await ProtectedLocalStorage.SetAsync("asp_token", token);
-                    await ProtectedLocalStorage.SetAsync("asp_name", userName);
+                    await LocalStorage.SetItemAsync<string>("asp_token", token);
+                    await LocalStorage.SetItemAsync<string>("asp_name", userName);              
 
                     NavigationManager.NavigateTo("/dashboard");
 

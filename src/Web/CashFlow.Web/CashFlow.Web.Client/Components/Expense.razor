@@ -1,10 +1,14 @@
 ﻿@using CashFlow.Communication.Requests.Expenses
 @using CashFlow.Communication.Responses.Expenses
 @using System.Globalization
+@using System.Net.Http.Headers
+@using CashFlow.Web.Client.Services.Token
 
 @inject IConfiguration Configuration
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject CashFlowApiClientFactory ClientFactory
+@inject ITokenProvider TokenProvider
 
 <MudCard Class="d-flex rounded-10 px-3 flex-row" Style="width: 80%;">
     <MudCardContent Class="d-flex justify-space-between">
@@ -42,7 +46,11 @@
 
     private async Task DeleteExpense()
     {
-        using var clientFactory = CashFlowApiClientFactory.CreateClient(Configuration);
+        using var clientFactory = await ClientFactory.CreateClient(Configuration);
+
+        var token = await TokenProvider.Get();
+
+        clientFactory.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         try
         {            
