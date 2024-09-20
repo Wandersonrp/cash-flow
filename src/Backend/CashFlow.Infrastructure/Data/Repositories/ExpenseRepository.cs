@@ -23,19 +23,21 @@ internal class ExpenseRepository : IExpenseRepository
         return result.Entity;
     }
 
-    public async Task<int> CountAsync()
+    public async Task<int> CountAsync(int userId)
     {
         var count = await _context
             .Expenses
+            .Where(x => x.UserId == userId)
             .CountAsync();
 
         return count;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id, int userId)
     {
         var result = await _context
             .Expenses
+            .Include(x => x.UserId == userId)
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (result is null)
@@ -57,7 +59,7 @@ internal class ExpenseRepository : IExpenseRepository
         return expenseExists;
     }
 
-    public async Task<List<Expense>> FilterByMonth(DateOnly date)
+    public async Task<List<Expense>> FilterByMonth(DateOnly date, int userId)
     {
         var startDate = new DateTime(year: date.Year, month: date.Month, day: 1, 0, 0, 0, DateTimeKind.Utc).Date;
 
@@ -68,7 +70,7 @@ internal class ExpenseRepository : IExpenseRepository
         return await _context
             .Expenses
             .AsNoTracking()
-            .Where(x => x.Date >= startDate && x.Date <= endDate)
+            .Where(x => x.Date >= startDate && x.Date <= endDate && x.UserId == userId)
             .OrderBy(x => x.Date)
             .ThenBy(x => x.Title)
             .ToListAsync();
@@ -76,12 +78,10 @@ internal class ExpenseRepository : IExpenseRepository
 
     public async Task<(List<Expense> expenses, int count)> GetAllAsync(int page, int itemsPerPage, int userId)
     {              
-
         var query = _context
             .Expenses
             .AsNoTracking()
             .Where(x => x.UserId == userId);
-
 
         var count = await query.CountAsync();
 
@@ -96,34 +96,35 @@ internal class ExpenseRepository : IExpenseRepository
         return (expenses, count);
     }
 
-    public async Task<Expense?> GetByIdAsync(int id)
+    public async Task<Expense?> GetByIdAsync(int id, int userId)
     {
         var expense = await _context
             .Expenses
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
         return expense;
     }
 
-    public async Task<Expense?> GetByIdWithTracking(int id)
+    public async Task<Expense?> GetByIdWithTracking(int id, int userId)
     {
         var expense = await _context
             .Expenses
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
         return expense;
     }
 
-    public async Task<decimal> SumTotalAsync()
+    public async Task<decimal> SumTotalAsync(int userId)
     {
         return await _context
             .Expenses
+            .Where(x => x.UserId == userId) 
             .SumAsync(x => x.Amount);
     }
 
     public void Update(Expense expense)
-    {
+    {        
         _context.Expenses.Update(expense);
     }
 }

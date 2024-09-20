@@ -1,5 +1,7 @@
 ﻿using CashFlow.Application.UseCases.Reports.Expenses.Excel;
 using CashFlow.Application.UseCases.Reports.Expenses.Pdf;
+using CashFlow.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 
@@ -7,6 +9,7 @@ namespace CashFlow.Api.Controllers.Reports.Expenses;
 
 [Route("api/reports/expenses/")]
 [ApiController]
+[Authorize(Roles = nameof(Role.Admin))]
 public class ExpenseReportsController : ControllerBase
 {
     [HttpGet]

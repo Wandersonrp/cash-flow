@@ -4,6 +4,7 @@ using CashFlow.Domain.Entities;
 using CashFlow.Domain.Extensions;
 using CashFlow.Domain.Repositories.Expenses;
 using CashFlow.Domain.Resources.Reports;
+using CashFlow.Domain.Services.LoggedUser;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
@@ -16,17 +17,21 @@ public class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdf
     private const string CURRENCY_SYMBOL = "R$";
     private const int HEIGHT_ROW_EXPENSE_TABLE = 25;
     private readonly IExpenseRepository _expenseRepository;
+    private readonly ILoggedUser _loggedUser;
 
-    public GenerateExpensesReportPdfUseCase(IExpenseRepository expenseRepository)
+    public GenerateExpensesReportPdfUseCase(IExpenseRepository expenseRepository, ILoggedUser loggedUser)
     {
         _expenseRepository = expenseRepository;
+        _loggedUser = loggedUser;
 
         GlobalFontSettings.FontResolver = new ExpensesReportFontResolver();
     }
 
     public async Task<byte[]> Execute(DateOnly month)
     {
-        var expenses = await _expenseRepository.FilterByMonth(month);
+        var user = await _loggedUser.Get();
+
+        var expenses = await _expenseRepository.FilterByMonth(month, user.Id);
 
         if (expenses.Count == 0)
         {

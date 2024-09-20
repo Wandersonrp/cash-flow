@@ -38,15 +38,15 @@
     private ResponseUserJson? _user;
 
     protected override async Task OnInitializedAsync()
-    {
-        base.OnInitialized();
-
+    {        
         var accessToken = await LocalStorage.GetItemAsync<string>("asp_token");
 
         if (accessToken is null)
         {
             NavigationManager.NavigateTo("/login");
-        }        
+        }    
+        
+
 
         _theme = new()
         {

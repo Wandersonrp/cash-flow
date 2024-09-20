@@ -1,4 +1,5 @@
 ﻿using CashFlow.Domain.Entities;
+using CashFlow.Domain.Enums;
 using CashFlow.Domain.Security.Tokens;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,7 +23,8 @@ public class JwtTokenGenerator : IAccessTokenGenerator
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Sid, user.UserIdentifier.ToString()),
-            new Claim(ClaimTypes.Name, user.Name)
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.Role, nameof(user.Role))
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor
